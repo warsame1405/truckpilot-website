@@ -762,8 +762,7 @@ function goS(n){
 }
 setInterval(function(){goS((sCur+1)%slides.length);},3000);
 
-// Smart redirect for returning users
-(function(){try{var s=localStorage.getItem('tp-session-v1');if(s)window.location.replace('https://app.truckpilot.ca');}catch(e){}})();
+
 
 // Contact form
 function handleContact(e){
