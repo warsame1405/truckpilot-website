@@ -1,605 +1,779 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TruckPilot — Canada's Smartest Fleet App</title>
-  <meta name="description" content="Log loads, track pay, manage your fleet and file taxes automatically. Built exclusively for Canadian truckers and owner-operators.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;700;800;900&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    :root {
-      --navy: #1a2744;
-      --blue: #243B6E;
-      --gold: #FFD700;
-      --gold-dark: #E6B800;
-      --bg: #F4F1EC;
-      --white: #ffffff;
-      --text: #1a1a1a;
-      --muted: #666;
-      --border: rgba(0,0,0,0.08);
-    }
-
-    html { scroll-behavior: smooth; }
-    body { font-family: 'Barlow', sans-serif; background: var(--white); color: var(--text); overflow-x: hidden; }
-
-    /* NAV */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 999;
-      background: rgba(26,39,68,0.97); backdrop-filter: blur(12px);
-      height: 64px; display: flex; align-items: center;
-      justify-content: space-between; padding: 0 48px;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-    }
-    .logo { display: flex; align-items: baseline; gap: 0; text-decoration: none; }
-    .logo-truck {
-      font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 30px;
-      color: #fff; letter-spacing: 5px;
-      text-decoration: underline; text-decoration-color: var(--gold);
-      text-underline-offset: 6px; text-decoration-thickness: 3px;
-    }
-    .logo-pilot { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 30px; color: var(--gold); letter-spacing: 5px; }
-    .nav-links { display: flex; align-items: center; gap: 32px; }
-    .nav-links a { color: rgba(255,255,255,0.7); font-size: 14px; font-weight: 600; text-decoration: none; transition: color 0.2s; letter-spacing: 0.5px; }
-    .nav-links a:hover { color: #fff; }
-    .nav-cta { background: var(--gold); color: var(--navy); font-weight: 800; font-size: 14px; padding: 10px 24px; border-radius: 50px; text-decoration: none; transition: all 0.2s; letter-spacing: 0.5px; }
-    .nav-cta:hover { background: var(--gold-dark); transform: translateY(-1px); }
-    .nav-mobile-btn { display: none; background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; }
-
-    /* HERO */
-    .hero {
-      background: linear-gradient(160deg, #0d1a35 0%, #1a2744 40%, #243B6E 100%);
-      min-height: 100vh; display: flex; align-items: center;
-      padding: 120px 48px 80px; position: relative; overflow: hidden;
-    }
-    .hero::before {
-      content: ''; position: absolute; inset: 0;
-      background: radial-gradient(ellipse at 70% 50%, rgba(255,215,0,0.06) 0%, transparent 60%);
-      pointer-events: none;
-    }
-    .hero-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%; }
-    .hero-badge {
-      display: inline-flex; align-items: center; gap: 8px;
-      background: rgba(255,215,0,0.12); border: 1px solid rgba(255,215,0,0.35);
-      color: var(--gold); font-size: 12px; font-weight: 700; padding: 7px 16px;
-      border-radius: 50px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 24px;
-    }
-    .hero h1 {
-      font-family: 'Barlow Condensed', sans-serif; font-weight: 900;
-      font-size: 72px; line-height: 0.95; color: #fff; margin-bottom: 24px;
-      letter-spacing: -1px;
-    }
-    .hero h1 .gold { color: var(--gold); }
-    .hero-sub { font-size: 18px; color: rgba(255,255,255,0.7); line-height: 1.7; margin-bottom: 40px; max-width: 480px; }
-    .hero-btns { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 48px; }
-    .btn-gold { background: var(--gold); color: var(--navy); font-weight: 800; font-size: 16px; padding: 16px 36px; border-radius: 50px; text-decoration: none; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
-    .btn-gold:hover { background: var(--gold-dark); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,215,0,0.3); }
-    .btn-outline { background: transparent; color: #fff; font-weight: 700; font-size: 16px; padding: 16px 36px; border-radius: 50px; text-decoration: none; border: 2px solid rgba(255,255,255,0.3); transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
-    .btn-outline:hover { border-color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.05); }
-    .hero-trust { display: flex; align-items: center; gap: 20px; }
-    .hero-trust-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 600; }
-    .hero-trust-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
-
-    /* PHONE MOCKUP */
-    .hero-visual { position: relative; display: flex; justify-content: center; }
-    .phone-frame {
-      width: 280px; height: 560px; background: #0d1a35;
-      border-radius: 40px; border: 8px solid rgba(255,255,255,0.15);
-      overflow: hidden; position: relative; box-shadow: 0 40px 80px rgba(0,0,0,0.5);
-    }
-    .phone-notch { width: 80px; height: 24px; background: #0d1a35; border-radius: 0 0 16px 16px; margin: 0 auto; position: absolute; top: 0; left: 50%; transform: translateX(-50%); z-index: 2; }
-    .phone-screen { width: 100%; height: 100%; background: linear-gradient(180deg, #1a2744 0%, #0f1d35 100%); padding: 40px 16px 16px; }
-    .phone-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .phone-logo { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 18px; letter-spacing: 2px; }
-    .phone-logo span:first-child { color: #fff; }
-    .phone-logo span:last-child { color: var(--gold); }
-    .phone-avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: var(--navy); }
-    .phone-card { background: rgba(255,255,255,0.06); border-radius: 14px; padding: 14px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.08); }
-    .phone-card-label { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.4); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px; }
-    .phone-card-value { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 900; color: #fff; }
-    .phone-card-value.gold { color: var(--gold); }
-    .phone-card-sub { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
-    .phone-row { display: flex; gap: 8px; margin-bottom: 10px; }
-    .phone-card-sm { flex: 1; background: rgba(255,255,255,0.06); border-radius: 12px; padding: 12px; border: 1px solid rgba(255,255,255,0.08); text-align: center; }
-    .phone-card-sm .label { font-size: 9px; color: rgba(255,255,255,0.4); font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
-    .phone-card-sm .val { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 900; color: #fff; }
-    .phone-load { background: rgba(255,255,255,0.06); border-radius: 12px; padding: 12px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 8px; }
-    .phone-load-route { font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 4px; }
-    .phone-load-details { display: flex; justify-content: space-between; }
-    .phone-load-details span { font-size: 10px; color: rgba(255,255,255,0.4); }
-    .phone-load-details .amount { color: var(--gold); font-weight: 700; }
-    .phone-nav { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(13,26,53,0.95); border-top: 1px solid rgba(255,255,255,0.08); display: flex; padding: 10px 0 16px; }
-    .phone-nav-item { flex: 1; text-align: center; font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.3); letter-spacing: 0.5px; }
-    .phone-nav-item.active { color: var(--gold); }
-    .phone-glow { position: absolute; top: -20px; right: -20px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(255,215,0,0.15) 0%, transparent 70%); border-radius: 50%; pointer-events: none; }
-
-    /* STATS */
-    .stats-bar { background: var(--bg); padding: 0; }
-    .stats-inner { display: grid; grid-template-columns: repeat(4,1fr); max-width: 1200px; margin: 0 auto; }
-    .stat-item { padding: 40px 32px; text-align: center; border-right: 1px solid var(--border); }
-    .stat-item:last-child { border-right: none; }
-    .stat-num { font-family: 'Barlow Condensed', sans-serif; font-size: 48px; font-weight: 900; color: var(--navy); line-height: 1; margin-bottom: 6px; }
-    .stat-label { font-size: 13px; color: var(--muted); font-weight: 600; letter-spacing: 0.5px; }
-
-    /* SECTION */
-    .section { padding: 100px 48px; }
-    .section-inner { max-width: 1200px; margin: 0 auto; }
-    .section-tag { font-size: 11px; font-weight: 800; color: var(--blue); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 14px; }
-    .section-title { font-family: 'Barlow Condensed', sans-serif; font-size: 52px; font-weight: 900; color: var(--navy); line-height: 1; margin-bottom: 20px; letter-spacing: -0.5px; }
-    .section-sub { font-size: 17px; color: var(--muted); line-height: 1.7; max-width: 520px; margin-bottom: 56px; }
-
-    /* FEATURES */
-    .features-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; }
-    .feature-card {
-      background: #fff; border-radius: 20px; padding: 32px;
-      border: 1px solid var(--border); transition: all 0.3s;
-      position: relative; overflow: hidden;
-    }
-    .feature-card:hover { transform: translateY(-4px); box-shadow: 0 20px 48px rgba(36,59,110,0.1); border-color: rgba(36,59,110,0.2); }
-    .feature-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--navy), var(--gold)); opacity: 0; transition: opacity 0.3s; }
-    .feature-card:hover::before { opacity: 1; }
-    .feature-icon { width: 52px; height: 52px; background: linear-gradient(135deg, var(--navy), var(--blue)); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 20px; }
-    .feature-title { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 800; color: var(--navy); margin-bottom: 10px; letter-spacing: 0.3px; }
-    .feature-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
-
-    /* HOW IT WORKS */
-    .how-section { background: var(--navy); padding: 100px 48px; }
-    .how-inner { max-width: 1200px; margin: 0 auto; }
-    .how-section .section-tag { color: var(--gold); }
-    .how-section .section-title { color: #fff; }
-    .how-section .section-sub { color: rgba(255,255,255,0.6); }
-    .steps-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 40px; }
-    .step-card { position: relative; }
-    .step-num {
-      width: 64px; height: 64px; border-radius: 50%;
-      background: var(--gold); color: var(--navy);
-      font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 900;
-      display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
-    }
-    .step-title { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 800; color: #fff; margin-bottom: 10px; }
-    .step-desc { font-size: 15px; color: rgba(255,255,255,0.6); line-height: 1.7; }
-    .step-connector { position: absolute; top: 32px; left: calc(100% - 20px); width: 40px; height: 2px; background: rgba(255,215,0,0.3); }
-
-    /* SECURITY */
-    .security-section { background: var(--bg); padding: 100px 48px; }
-    .security-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
-    .security-badge { display: inline-flex; align-items: center; gap: 10px; background: rgba(36,59,110,0.1); border: 1px solid rgba(36,59,110,0.2); color: var(--navy); padding: 10px 20px; border-radius: 50px; font-size: 13px; font-weight: 700; margin-bottom: 24px; }
-    .security-points { display: flex; flex-direction: column; gap: 16px; }
-    .security-point { display: flex; align-items: flex-start; gap: 14px; }
-    .security-point-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--navy); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
-    .security-point-title { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 3px; }
-    .security-point-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
-    .pipeda-card { background: var(--navy); border-radius: 24px; padding: 40px; color: #fff; }
-    .pipeda-flag { font-size: 40px; margin-bottom: 16px; }
-    .pipeda-title { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 900; margin-bottom: 12px; line-height: 1.1; }
-    .pipeda-title span { color: var(--gold); }
-    .pipeda-desc { font-size: 14px; color: rgba(255,255,255,0.65); line-height: 1.7; margin-bottom: 20px; }
-    .pipeda-checks { display: flex; flex-direction: column; gap: 10px; }
-    .pipeda-check { display: flex; align-items: center; gap: 10px; font-size: 14px; color: rgba(255,255,255,0.8); font-weight: 600; }
-    .check-dot { width: 20px; height: 20px; border-radius: 50%; background: var(--gold); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--navy); font-weight: 900; flex-shrink: 0; }
-
-    /* PLANS */
-    .plans-section { padding: 100px 48px; }
-    .plans-inner { max-width: 1200px; margin: 0 auto; }
-    .plans-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; }
-    .plan-card { background: #fff; border-radius: 24px; padding: 40px 32px; border: 1.5px solid var(--border); position: relative; }
-    .plan-card.featured { background: var(--navy); border-color: var(--navy); }
-    .plan-popular { position: absolute; top: -14px; left: 50%; transform: translateX(-50%); background: var(--gold); color: var(--navy); font-size: 11px; font-weight: 800; padding: 5px 16px; border-radius: 50px; letter-spacing: 1px; white-space: nowrap; }
-    .plan-badge { font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 10px; letter-spacing: 1px; }
-    .plan-card.featured .plan-badge { color: var(--gold); }
-    .plan-name { font-family: 'Barlow Condensed', sans-serif; font-size: 32px; font-weight: 900; color: var(--navy); margin-bottom: 6px; }
-    .plan-card.featured .plan-name { color: #fff; }
-    .plan-price { font-family: 'Barlow Condensed', sans-serif; font-size: 52px; font-weight: 900; color: var(--navy); line-height: 1; margin-bottom: 24px; }
-    .plan-card.featured .plan-price { color: var(--gold); }
-    .plan-price sup { font-size: 24px; vertical-align: super; }
-    .plan-price sub { font-size: 16px; color: var(--muted); font-weight: 500; font-family: 'Barlow', sans-serif; }
-    .plan-card.featured .plan-price sub { color: rgba(255,255,255,0.4); }
-    .plan-divider { border: none; border-top: 1px solid var(--border); margin-bottom: 24px; }
-    .plan-card.featured .plan-divider { border-color: rgba(255,255,255,0.1); }
-    .plan-features { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
-    .plan-features li { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text); font-weight: 500; }
-    .plan-card.featured .plan-features li { color: rgba(255,255,255,0.85); }
-    .plan-check { width: 20px; height: 20px; border-radius: 50%; background: rgba(36,59,110,0.1); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--navy); font-weight: 800; flex-shrink: 0; }
-    .plan-card.featured .plan-check { background: rgba(255,215,0,0.2); color: var(--gold); }
-    .plan-btn { width: 100%; padding: 15px; border-radius: 50px; font-weight: 800; font-size: 15px; cursor: pointer; border: none; text-decoration: none; display: block; text-align: center; transition: all 0.2s; letter-spacing: 0.5px; }
-    .plan-btn-navy { background: transparent; border: 2px solid var(--navy); color: var(--navy); }
-    .plan-btn-navy:hover { background: var(--navy); color: #fff; }
-    .plan-btn-gold { background: var(--gold); color: var(--navy); }
-    .plan-btn-gold:hover { background: var(--gold-dark); transform: translateY(-1px); }
-
-    /* APPLY / JOIN */
-    .apply-section { background: linear-gradient(135deg, #0d1a35, #1a2744, #243B6E); padding: 100px 48px; text-align: center; position: relative; overflow: hidden; }
-    .apply-section::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 600px; height: 600px; background: radial-gradient(circle, rgba(255,215,0,0.08) 0%, transparent 70%); border-radius: 50%; pointer-events: none; }
-    .apply-inner { max-width: 680px; margin: 0 auto; position: relative; }
-    .apply-inner .section-tag { color: var(--gold); text-align: center; }
-    .apply-title { font-family: 'Barlow Condensed', sans-serif; font-size: 60px; font-weight: 900; color: #fff; line-height: 0.95; margin-bottom: 20px; letter-spacing: -1px; }
-    .apply-title span { color: var(--gold); }
-    .apply-sub { font-size: 17px; color: rgba(255,255,255,0.65); margin-bottom: 40px; line-height: 1.7; }
-    .apply-form { display: flex; gap: 12px; max-width: 480px; margin: 0 auto 20px; }
-    .apply-input { flex: 1; padding: 16px 20px; border-radius: 50px; border: 1.5px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); color: #fff; font-size: 15px; font-family: 'Barlow', sans-serif; outline: none; transition: border-color 0.2s; }
-    .apply-input::placeholder { color: rgba(255,255,255,0.4); }
-    .apply-input:focus { border-color: var(--gold); }
-    .apply-btn-submit { background: var(--gold); color: var(--navy); font-weight: 800; font-size: 15px; padding: 16px 28px; border-radius: 50px; border: none; cursor: pointer; white-space: nowrap; transition: all 0.2s; font-family: 'Barlow', sans-serif; }
-    .apply-btn-submit:hover { background: var(--gold-dark); transform: translateY(-1px); }
-    .apply-note { font-size: 13px; color: rgba(255,255,255,0.4); }
-    .apply-or { color: rgba(255,255,255,0.4); font-size: 14px; margin: 20px 0; }
-
-    /* FOOTER */
-    footer { background: #0a1020; padding: 60px 48px 32px; }
-    .footer-inner { max-width: 1200px; margin: 0 auto; }
-    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
-    .footer-brand .logo { margin-bottom: 16px; display: inline-flex; }
-    .footer-brand p { font-size: 14px; color: rgba(255,255,255,0.4); line-height: 1.7; max-width: 260px; }
-    .footer-col h4 { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.6); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 16px; }
-    .footer-col a { display: block; font-size: 14px; color: rgba(255,255,255,0.4); text-decoration: none; margin-bottom: 10px; transition: color 0.2s; }
-    .footer-col a:hover { color: #fff; }
-    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.06); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; }
-    .footer-bottom p { font-size: 13px; color: rgba(255,255,255,0.25); }
-    .footer-contact { display: flex; gap: 20px; }
-    .footer-contact a { font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s; }
-    .footer-contact a:hover { color: rgba(255,255,255,0.7); }
-
-    /* ANIMATIONS */
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-    .hero-grid { animation: fadeUp 0.8s ease both; }
-    .phone-frame { animation: float 4s ease-in-out infinite; }
-
-    /* RESPONSIVE */
-    @media (max-width: 900px) {
-      nav { padding: 0 24px; }
-      .nav-links { display: none; }
-      .nav-mobile-btn { display: block; }
-      .hero { padding: 100px 24px 60px; }
-      .hero-grid { grid-template-columns: 1fr; gap: 48px; text-align: center; }
-      .hero h1 { font-size: 52px; }
-      .hero-btns { justify-content: center; }
-      .hero-trust { justify-content: center; }
-      .hero-visual { display: none; }
-      .stats-inner { grid-template-columns: repeat(2,1fr); }
-      .stat-item:nth-child(2) { border-right: none; }
-      .features-grid { grid-template-columns: 1fr; }
-      .steps-grid { grid-template-columns: 1fr; gap: 32px; }
-      .security-inner { grid-template-columns: 1fr; }
-      .plans-grid { grid-template-columns: 1fr; }
-      .footer-grid { grid-template-columns: 1fr 1fr; }
-      .section { padding: 60px 24px; }
-      .how-section, .security-section, .plans-section, .apply-section { padding: 60px 24px; }
-      .apply-form { flex-direction: column; }
-      .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TruckPilot — Canada's Smartest Fleet App</title>
+<meta name="description" content="Log loads, track pay, manage your fleet and file taxes automatically. Built for Canadian truckers.">
+<meta property="og:title" content="TruckPilot — Canada's Smartest Fleet App">
+<meta property="og:url" content="https://truckpilot.ca">
+<link rel="canonical" href="https://truckpilot.ca">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--navy:#1a2744;--blue:#243B6E;--gold:#FFD700;--bg:#F4F1EC}
+body{font-family:'Barlow',sans-serif;background:#fff;color:#1a1a1a;overflow-x:hidden}
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:999;background:rgba(26,39,68,0.97);height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.logo{display:flex;align-items:baseline;text-decoration:none}
+.lt{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;color:#fff;letter-spacing:5px;text-decoration:underline;text-decoration-color:#FFD700;text-underline-offset:5px;text-decoration-thickness:3px}
+.lp{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;color:#FFD700;letter-spacing:5px}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-links a{color:rgba(255,255,255,0.7);font-size:14px;font-weight:600;text-decoration:none}
+.nav-links a:hover{color:#fff}
+.ncta{background:#FFD700;color:#1a2744;font-weight:800;font-size:14px;padding:10px 22px;border-radius:50px;text-decoration:none}
+.hmb{display:none;background:none;border:none;color:#fff;font-size:22px;cursor:pointer}
+/* HERO */
+.hero{background:linear-gradient(160deg,#0d1a35 0%,#1a2744 45%,#243B6E 100%);min-height:100vh;display:flex;align-items:center;padding:100px 40px 60px;position:relative}
+.hero-inner{max-width:1200px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,215,0,0.12);border:1px solid rgba(255,215,0,0.3);color:#FFD700;font-size:11px;font-weight:700;padding:6px 14px;border-radius:50px;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px}
+.hero h1{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:68px;line-height:0.95;color:#fff;margin-bottom:20px;letter-spacing:-1px}
+.hero h1 span{color:#FFD700}
+.hero p{font-size:17px;color:rgba(255,255,255,0.7);line-height:1.7;margin-bottom:32px;max-width:460px}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:32px}
+.btn-gold{background:#FFD700;color:#1a2744;font-weight:800;font-size:15px;padding:14px 32px;border-radius:50px;text-decoration:none;transition:all 0.2s}
+.btn-gold:hover{background:#E6B800;transform:translateY(-2px)}
+.btn-out{background:transparent;color:#fff;font-weight:700;font-size:15px;padding:14px 32px;border-radius:50px;text-decoration:none;border:2px solid rgba(255,255,255,0.3);transition:all 0.2s}
+.trust{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.trust-item{display:flex;align-items:center;gap:6px;font-size:13px;color:rgba(255,255,255,0.5);font-weight:600}
+.trust-dot{width:6px;height:6px;border-radius:50%;background:#FFD700}
+/* PHONE SLIDESHOW */
+#phone-show{width:280px;position:relative;flex-shrink:0}
+.pframe{width:280px;height:560px;background:#0a1628;border-radius:44px;border:8px solid rgba(255,255,255,0.15);overflow:hidden;position:relative;box-shadow:0 40px 80px rgba(0,0,0,0.6)}
+.pnotch{width:80px;height:24px;background:#0a1628;border-radius:0 0 16px 16px;position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:10}
+.pslide{position:absolute;inset:0;background:linear-gradient(180deg,#1a2744,#0f1d35);padding:36px 14px 60px;opacity:0;transition:opacity 0.8s}
+.pslide.active{opacity:1}
+.pnav{position:absolute;bottom:0;left:0;right:0;background:rgba(10,22,40,0.97);border-top:1px solid rgba(255,255,255,0.08);display:flex;padding:10px 0 14px}
+.pni{flex:1;text-align:center;font-size:8px;font-weight:700;color:rgba(255,255,255,0.3)}
+.pni.on{color:#FFD700}
+.pdots{display:flex;justify-content:center;gap:7px;margin-top:14px}
+.pdot{width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,0.3);transition:all 0.3s;cursor:pointer}
+.pdot.on{width:22px;background:#FFD700}
+.plab{text-align:center;margin-top:10px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:1px;text-transform:uppercase}
+/* PHONE CARD UTILS */
+.pc{background:rgba(255,255,255,0.06);border-radius:10px;padding:10px;margin-bottom:7px}
+.pcg{background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.2);border-radius:10px;padding:10px;margin-bottom:7px}
+.pcgr{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);border-radius:10px;padding:10px;margin-bottom:7px}
+.pl{font-size:8px;color:rgba(255,255,255,0.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
+.pv{font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#fff}
+.pvg{font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#FFD700}
+.pvgr{font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#4ade80}
+.ph{font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#fff;font-size:14px;margin-bottom:8px}
+.ps{font-size:9px;color:rgba(255,255,255,0.4);margin-bottom:10px}
+.pr{display:flex;gap:6px;margin-bottom:7px}
+/* STATS */
+.stats{background:var(--bg);display:grid;grid-template-columns:repeat(4,1fr)}
+.stat{padding:40px 24px;text-align:center;border-right:1px solid rgba(0,0,0,0.08)}
+.stat:last-child{border-right:none}
+.stat-n{font-family:'Barlow Condensed',sans-serif;font-size:44px;font-weight:900;color:var(--navy);line-height:1;margin-bottom:5px}
+.stat-l{font-size:13px;color:#666;font-weight:600}
+/* SECTIONS */
+.section{padding:80px 40px}
+.sec-inner{max-width:1200px;margin:0 auto}
+.stag{font-size:11px;font-weight:800;color:var(--blue);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px}
+.stag-w{color:#FFD700}
+.stitle{font-family:'Barlow Condensed',sans-serif;font-size:48px;font-weight:900;color:var(--navy);line-height:1;margin-bottom:16px}
+.stitle-w{color:#fff}
+.ssub{font-size:16px;color:#666;line-height:1.7;max-width:520px;margin-bottom:48px}
+.ssub-w{color:rgba(255,255,255,0.65)}
+/* PHONE GRID SECTIONS */
+.pg-section{padding:80px 40px}
+.pg-inner{max-width:1200px;margin:0 auto}
+.pg-title{text-align:center;margin-bottom:48px}
+.pg-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;justify-items:center}
+.pg-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;justify-items:center}
+.ph-wrap{display:flex;flex-direction:column;align-items:center}
+.ph-small{width:200px;height:400px;background:#0a1628;border-radius:32px;border:6px solid rgba(255,255,255,0.15);overflow:hidden;position:relative;box-shadow:0 24px 48px rgba(0,0,0,0.5)}
+.ph-notch{width:56px;height:16px;background:#0a1628;border-radius:0 0 10px 10px;position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:10}
+.ph-screen{position:absolute;inset:0;background:linear-gradient(180deg,#1a2744,#0f1d35);padding:24px 10px 50px}
+.ph-nav{position:absolute;bottom:0;left:0;right:0;background:rgba(10,22,40,0.97);border-top:1px solid rgba(255,255,255,0.08);display:flex;padding:7px 0 10px}
+.ph-ni{flex:1;text-align:center;font-size:7px;font-weight:700;color:rgba(255,255,255,0.3)}
+.ph-ni.on{color:#FFD700}
+.ph-lbl{font-size:10px;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:1px;text-transform:uppercase;margin-top:10px}
+/* SMALL CARD UTILS */
+.sc{background:rgba(255,255,255,0.06);border-radius:8px;padding:8px;margin-bottom:6px}
+.scg{background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.2);border-radius:8px;padding:8px;margin-bottom:6px}
+.scgr{background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.25);border-radius:8px;padding:8px;margin-bottom:6px}
+.sl{font-size:7px;color:rgba(255,255,255,0.4);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
+.sv{font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#fff}
+.svg-{font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#FFD700}
+.svgr{font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#4ade80}
+.sh{font-family:'Barlow Condensed',sans-serif;font-weight:900;color:#fff;font-size:12px;margin-bottom:6px}
+.ss{font-size:8px;color:rgba(255,255,255,0.4);margin-bottom:8px}
+/* FEATURES */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.feat-card{background:#fff;border-radius:18px;padding:28px;border:1px solid rgba(0,0,0,0.08);transition:all 0.3s}
+.feat-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(36,59,110,0.1)}
+.feat-icon{width:48px;height:48px;background:linear-gradient(135deg,var(--navy),var(--blue));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px}
+.feat-t{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:800;color:var(--navy);margin-bottom:8px}
+.feat-d{font-size:14px;color:#666;line-height:1.6}
+/* HOW IT WORKS */
+.how{background:var(--navy);padding:80px 40px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:36px}
+.step-n{width:60px;height:60px;border-radius:50%;background:#FFD700;color:var(--navy);font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.step-t{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:8px}
+.step-d{font-size:14px;color:rgba(255,255,255,0.6);line-height:1.7}
+/* SECURITY */
+.sec-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.pip-card{background:var(--navy);border-radius:20px;padding:36px;color:#fff}
+.pip-title{font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;margin-bottom:10px}
+.pip-title span{color:#FFD700}
+.pip-checks{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.pip-check{display:flex;align-items:center;gap:10px;font-size:14px;color:rgba(255,255,255,0.8);font-weight:600}
+.chk{width:20px;height:20px;border-radius:50%;background:#FFD700;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--navy);font-weight:900;flex-shrink:0}
+.sec-pts{display:flex;flex-direction:column;gap:16px}
+.sec-pt{display:flex;align-items:flex-start;gap:12px}
+.sec-pt-icon{width:36px;height:36px;border-radius:10px;background:var(--navy);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.sec-pt-t{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:3px}
+.sec-pt-d{font-size:13px;color:#666;line-height:1.6}
+/* TESTIMONIALS */
+.test-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.test-card{background:#fff;border-radius:18px;padding:28px;border:1px solid rgba(0,0,0,0.08)}
+.test-stars{color:#FFD700;font-size:18px;margin-bottom:12px}
+.test-text{font-size:14px;color:#555;line-height:1.7;margin-bottom:18px}
+.test-name{font-size:14px;font-weight:700;color:var(--navy)}
+.test-role{font-size:12px;color:#888}
+.test-av{width:40px;height:40px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:16px;color:#FFD700;flex-shrink:0}
+/* BETA */
+.beta-sec{padding:80px 40px;background:var(--bg)}
+.beta-inner{max-width:680px;margin:0 auto;text-align:center}
+.beta-card{background:var(--navy);border-radius:24px;padding:48px 36px;text-align:center;margin-bottom:24px}
+.beta-feat{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:32px}
+.beta-feat-item{background:rgba(255,255,255,0.06);border-radius:12px;padding:14px;text-align:center}
+/* APPLY */
+.apply{background:linear-gradient(135deg,#0d1a35,#1a2744,#243B6E);padding:80px 40px;text-align:center;position:relative}
+.apply-inner{max-width:640px;margin:0 auto;position:relative}
+.apply-t{font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:900;color:#fff;line-height:0.95;margin-bottom:16px}
+.apply-t span{color:#FFD700}
+/* CONTACT */
+.contact-sec{background:#fff;padding:80px 40px}
+.contact-inner{max-width:600px;margin:0 auto;text-align:center}
+.cinput{width:100%;padding:13px 16px;border-radius:12px;border:1.5px solid rgba(0,0,0,0.12);font-size:15px;font-family:'Barlow',sans-serif;outline:none;margin-bottom:14px}
+.cinput:focus{border-color:var(--navy)}
+.csel{width:100%;padding:13px 16px;border-radius:12px;border:1.5px solid rgba(0,0,0,0.12);font-size:15px;font-family:'Barlow',sans-serif;background:#fff;margin-bottom:14px}
+.ctarea{width:100%;padding:13px 16px;border-radius:12px;border:1.5px solid rgba(0,0,0,0.12);font-size:15px;font-family:'Barlow',sans-serif;resize:vertical;margin-bottom:14px}
+.csubmit{width:100%;padding:15px;background:var(--navy);color:#fff;border:none;border-radius:50px;font-weight:800;font-size:15px;cursor:pointer;font-family:'Barlow',sans-serif}
+/* FOOTER */
+footer{background:#0a1020;padding:48px 40px 28px}
+.foot-inner{max-width:1200px;margin:0 auto}
+.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
+.foot-col h4{font-size:12px;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px}
+.foot-col a{display:block;font-size:14px;color:rgba(255,255,255,0.4);text-decoration:none;margin-bottom:9px}
+.foot-col a:hover{color:#fff}
+.foot-bot{border-top:1px solid rgba(255,255,255,0.06);padding-top:20px;display:flex;justify-content:space-between;align-items:center}
+.foot-bot p{font-size:12px;color:rgba(255,255,255,0.25)}
+/* WHATSAPP */
+.wa{position:fixed;bottom:24px;right:24px;z-index:9999;width:56px;height:56px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(37,211,102,0.4);text-decoration:none;transition:transform 0.2s}
+.wa:hover{transform:scale(1.1)}
+/* ANIMATIONS */
+@keyframes scan-p{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+#phone-show{animation:float 4s ease-in-out infinite}
+/* RESPONSIVE */
+@media(max-width:900px){
+  nav{padding:0 20px}.nav-links{display:none}.hmb{display:block}
+  .hero{padding:90px 20px 50px}.hero-inner{grid-template-columns:1fr;text-align:center}
+  .hero h1{font-size:48px}.hero-btns{justify-content:center}.trust{justify-content:center}
+  #phone-show{display:none}
+  .stats{grid-template-columns:repeat(2,1fr)}.stat:nth-child(2){border-right:none}
+  .feat-grid{grid-template-columns:1fr}.steps{grid-template-columns:1fr}
+  .sec-grid{grid-template-columns:1fr}.test-grid{grid-template-columns:1fr}
+  .pg-grid-4{grid-template-columns:repeat(2,1fr)}.pg-grid-3{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr}.foot-bot{flex-direction:column;gap:10px;text-align:center}
+  .section,.pg-section,.beta-sec,.apply,.contact-sec{padding:56px 20px}
+  .how{padding:56px 20px}.beta-feat{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:480px){.pg-grid-4{grid-template-columns:1fr}.hero h1{font-size:40px}.stitle{font-size:36px}}
+</style>
 </head>
 <body>
 
 <!-- NAV -->
 <nav>
-  <a href="#" class="logo">
-    <span class="logo-truck">TRUCK</span><span class="logo-pilot">PILOT</span>
-  </a>
+  <a href="#" class="logo"><span class="lt">TRUCK</span><span class="lp">PILOT</span></a>
   <div class="nav-links">
     <a href="#features">Features</a>
     <a href="#how">How It Works</a>
     <a href="#plans">Pricing</a>
     <a href="#contact">Contact</a>
-    <a href="https://app.truckpilot.ca" class="nav-cta">Open App →</a>
+    <a href="get-started.html" class="ncta">Get Started →</a>
   </div>
-  <button class="nav-mobile-btn" onclick="document.querySelector('.nav-links').style.display = document.querySelector('.nav-links').style.display === 'flex' ? 'none' : 'flex'">☰</button>
+  <button class="hmb" onclick="document.querySelector('.nav-links').style.display=document.querySelector('.nav-links').style.display==='flex'?'none':'flex'">☰</button>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-grid">
+  <div class="hero-inner">
     <div>
-      <div class="hero-badge">🇨🇦 Built for Canadian Truckers</div>
-      <h1>Your Fleet.<br><span class="gold">Runs Itself.</span></h1>
-      <p class="hero-sub">Log loads, track pay, manage your fleet and file taxes — all auto-generated. Just sign in and drive.</p>
+      <div class="badge">🇨🇦 Built for Canadian Truckers</div>
+      <h1>Your Fleet.<br><span>Runs Itself.</span></h1>
+      <p>Log loads, track pay, manage your fleet and file taxes — all auto-generated. Just sign in and drive.</p>
       <div class="hero-btns">
-        <a href="https://app.truckpilot.ca" class="btn-gold">🚛 Open the App</a>
-        <a href="#features" class="btn-outline">See Features</a>
+        <a href="get-started.html" class="btn-gold">🚛 Get Started Free</a>
+        <a href="#features" class="btn-out">See Features</a>
       </div>
-      <div class="hero-trust">
-        <div class="hero-trust-item"><div class="hero-trust-dot"></div>PIPEDA Compliant</div>
-        <div class="hero-trust-item"><div class="hero-trust-dot"></div>AI Powered</div>
-        <div class="hero-trust-item"><div class="hero-trust-dot"></div>Free to Start</div>
+      <div class="trust">
+        <div class="trust-item"><div class="trust-dot"></div>PIPEDA Compliant</div>
+        <div class="trust-item"><div class="trust-dot"></div>AI Powered</div>
+        <div class="trust-item"><div class="trust-dot"></div>Free to Start</div>
       </div>
     </div>
-    <div class="hero-visual">
-      <div class="phone-glow"></div>
-      <div class="phone-frame">
-        <div class="phone-notch"></div>
-        <div class="phone-screen">
-          <div class="phone-header">
-            <div class="phone-logo"><span>TRUCK</span><span>PILOT</span></div>
-            <div class="phone-avatar">MW</div>
-          </div>
-          <div class="phone-card">
-            <div class="phone-card-label">Total Earnings — March</div>
-            <div class="phone-card-value gold">$14,280.00</div>
-            <div class="phone-card-sub">↑ 12% from last month</div>
-          </div>
-          <div class="phone-row">
-            <div class="phone-card-sm">
-              <div class="label">Loads</div>
-              <div class="val">28</div>
+    <!-- ANIMATED PHONE SLIDESHOW -->
+    <div style="display:flex;flex-direction:column;align-items:center;">
+      <div id="phone-show">
+        <div class="pframe">
+          <div class="pnotch"></div>
+          <!-- Slide 1: Dashboard Owner -->
+          <div class="pslide active">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+              <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:14px;color:#fff">Good Morning 👋</div>
+              <div style="width:26px;height:26px;border-radius:50%;background:#FFD700;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#1a2744">M</div>
             </div>
-            <div class="phone-card-sm">
-              <div class="label">Drivers</div>
-              <div class="val">4</div>
+            <div class="pcg"><div class="pl">Today's Earnings</div><div class="pvg" style="font-size:24px">$1,480.00</div><div style="font-size:9px;color:#4ade80;margin-top:2px">↑ 3 loads completed</div></div>
+            <div class="pr">
+              <div style="flex:1" class="pc"><div class="pl">Gross</div><div class="pvg" style="font-size:16px">$3.2k</div></div>
+              <div style="flex:1" class="pc"><div class="pl">Drivers</div><div class="pv" style="font-size:16px">4</div></div>
+              <div style="flex:1" class="pc"><div class="pl">Loads</div><div class="pv" style="font-size:16px">28</div></div>
             </div>
-            <div class="phone-card-sm">
-              <div class="label">Net Pay</div>
-              <div class="val" style="color:var(--gold);">$9.2k</div>
+            <div class="ph" style="font-size:10px">Recent Loads</div>
+            <div class="pc" style="display:flex;justify-content:space-between"><div><div style="font-size:10px;font-weight:700;color:#fff">CNRL → Heartland</div><div style="font-size:8px;color:rgba(255,255,255,0.4)">Najeeb · TMW#4821</div></div><div class="pvg" style="font-size:11px">$510</div></div>
+            <div class="pc" style="display:flex;justify-content:space-between"><div><div style="font-size:10px;font-weight:700;color:#fff">Suncor → Heartland</div><div style="font-size:8px;color:rgba(255,255,255,0.4)">Ahmed · TMW#4820</div></div><div class="pvg" style="font-size:11px">$485</div></div>
+          </div>
+          <!-- Slide 2: AI Scanner -->
+          <div class="pslide">
+            <div class="ph">📷 AI LOAD SCANNER</div>
+            <div class="ps">Scan any dispatch sheet</div>
+            <div style="background:rgba(255,215,0,0.08);border:2px dashed rgba(255,215,0,0.3);border-radius:12px;padding:14px;text-align:center;margin-bottom:10px">
+              <div style="font-size:24px;margin-bottom:6px">📄</div>
+              <div style="font-size:10px;font-weight:800;color:#FFD700">🤖 Reading document...</div>
+              <div style="width:100%;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;margin-top:8px;overflow:hidden"><div style="width:60%;height:100%;background:#FFD700;border-radius:2px;animation:scan-p 1.5s ease-in-out infinite"></div></div>
+            </div>
+            <div class="pcgr"><div class="pl">✅ TMW NUMBER</div><div class="pvg" style="font-size:18px">TMW-48291</div></div>
+            <div class="pr">
+              <div style="flex:1" class="pcgr"><div class="pl">✅ FROM</div><div style="font-size:12px;font-weight:800;color:#fff">CNRL</div></div>
+              <div style="flex:1" class="pcgr"><div class="pl">✅ TO</div><div style="font-size:12px;font-weight:800;color:#fff">Heartland</div></div>
+            </div>
+            <div class="pr">
+              <div style="flex:1" class="pcgr"><div class="pl">✅ DATE</div><div style="font-size:11px;font-weight:800;color:#fff">Mar 19</div></div>
+              <div style="flex:1" class="pcgr"><div class="pl">✅ TRUCK</div><div style="font-size:11px;font-weight:800;color:#fff">T-17</div></div>
             </div>
           </div>
-          <div class="phone-card-label" style="color:rgba(255,255,255,0.3);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;">Recent Loads</div>
-          <div class="phone-load">
-            <div class="phone-load-route">CNRL → Heartland</div>
-            <div class="phone-load-details"><span>Today · TMW #4821</span><span class="amount">$510.00</span></div>
+          <!-- Slide 3: Payroll -->
+          <div class="pslide">
+            <div class="ph">💵 PAYROLL</div>
+            <div class="ps">March 2026 · 4 drivers</div>
+            <div class="pcg"><div class="pl">Total Payroll</div><div class="pvg" style="font-size:22px">$8,420.00</div></div>
+            <div class="pc" style="display:flex;align-items:center;gap:8px"><div style="width:26px;height:26px;border-radius:50%;background:#243B6E;display:flex;align-items:center;justify-content:center;font-weight:900;color:#FFD700;font-size:11px;flex-shrink:0">N</div><div style="flex:1"><div style="font-size:10px;font-weight:700;color:#fff">Najeeb A.</div><div style="font-size:8px;color:rgba(255,255,255,0.4)">12 loads</div></div><div class="pvgr" style="font-size:12px">$2,840</div></div>
+            <div class="pc" style="display:flex;align-items:center;gap:8px"><div style="width:26px;height:26px;border-radius:50%;background:#243B6E;display:flex;align-items:center;justify-content:center;font-weight:900;color:#FFD700;font-size:11px;flex-shrink:0">A</div><div style="flex:1"><div style="font-size:10px;font-weight:700;color:#fff">Ahmed K.</div><div style="font-size:8px;color:rgba(255,255,255,0.4)">10 loads</div></div><div class="pvgr" style="font-size:12px">$2,380</div></div>
+            <div class="pc" style="display:flex;align-items:center;gap:8px"><div style="width:26px;height:26px;border-radius:50%;background:#243B6E;display:flex;align-items:center;justify-content:center;font-weight:900;color:#FFD700;font-size:11px;flex-shrink:0">O</div><div style="flex:1"><div style="font-size:10px;font-weight:700;color:#fff">Omar S.</div><div style="font-size:8px;color:rgba(255,255,255,0.4)">14 loads</div></div><div class="pvgr" style="font-size:12px">$3,200</div></div>
+            <div style="background:#243B6E;border-radius:8px;padding:8px;text-align:center;margin-top:6px"><div style="font-size:10px;font-weight:800;color:#FFD700">⬇️ Download PDF</div></div>
           </div>
-          <div class="phone-load">
-            <div class="phone-load-route">Suncor → Heartland</div>
-            <div class="phone-load-details"><span>Yesterday · TMW #4820</span><span class="amount">$485.00</span></div>
+          <!-- Slide 4: Tax -->
+          <div class="pslide">
+            <div class="ph">🗂 CRA T2125</div>
+            <div class="ps">Full Year 2025</div>
+            <div class="pc" style="display:flex;justify-content:space-between"><span style="font-size:9px;color:rgba(255,255,255,0.5)">Revenue (L.8000)</span><span style="font-size:10px;font-weight:800;color:#fff">$87,420</span></div>
+            <div class="pc" style="display:flex;justify-content:space-between"><span style="font-size:9px;color:rgba(255,255,255,0.5)">Fuel (L.9220)</span><span style="font-size:10px;font-weight:800;color:#ff8a80">-$12,840</span></div>
+            <div class="pc" style="display:flex;justify-content:space-between"><span style="font-size:9px;color:rgba(255,255,255,0.5)">Maintenance (L.9281)</span><span style="font-size:10px;font-weight:800;color:#ff8a80">-$4,200</span></div>
+            <div class="pc" style="display:flex;justify-content:space-between"><span style="font-size:9px;color:rgba(255,255,255,0.5)">Meals (L.8523)</span><span style="font-size:10px;font-weight:800;color:#ff8a80">-$2,100</span></div>
+            <div class="pcg" style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:10px;font-weight:800;color:#FFD700">NET INCOME</span><span class="pvg" style="font-size:16px">$68,280</span></div>
+            <div style="background:#243B6E;border-radius:8px;padding:8px;text-align:center"><div style="font-size:10px;font-weight:800;color:#FFD700">⬇️ Export for Accountant</div></div>
           </div>
+          <!-- Slide 5: Drivers -->
+          <div class="pslide">
+            <div class="ph">👥 MY DRIVERS</div>
+            <div class="ps">Fleet · 4 active drivers</div>
+            <div class="pc" style="display:flex;align-items:center;gap:8px"><div style="width:30px;height:30px;border-radius:50%;background:#243B6E;display:flex;align-items:center;justify-content:center;font-weight:900;color:#FFD700;font-size:12px;flex-shrink:0">N</div><div style="flex:1"><div style="font-size:11px;font-weight:700;color:#fff">Najeeb A.</div><div style="font-size:8px;color:rgba(255,255,255,0.4)">12 loads · $2,840</div></div><div style="text-align:right"><div style="font-size:11px;color:#FFD700;font-weight:800">5.0★</div><div style="font-size:8px;color:#4ade80">Active</div></div></div>
+            <div class="pc" style="display:flex;align-items:center;gap:8px"><div style="width:30px;height:30px;border-radius:50%;background:#243B6E;display:flex;align-items:center;justify-content:center;font-weight:900;color:#FFD700;font-size:12px;flex-shrink:0">A</div><div style="flex:1"><div style="font-size:11px;font-weight:700;color:#fff">Ahmed K.</div><div style="font-size:8px;color:rgba(255,255,255,0.4)">10 loads · $2,380</div></div><div style="text-align:right"><div style="font-size:11px;color:#FFD700;font-weight:800">4.8★</div><div style="font-size:8px;color:#4ade80">Active</div></div></div>
+            <div class="pc" style="display:flex;align-items:center;gap:8px"><div style="width:30px;height:30px;border-radius:50%;background:#243B6E;display:flex;align-items:center;justify-content:center;font-weight:900;color:#FFD700;font-size:12px;flex-shrink:0">O</div><div style="flex:1"><div style="font-size:11px;font-weight:700;color:#fff">Omar S.</div><div style="font-size:8px;color:rgba(255,255,255,0.4)">14 loads · $3,200</div></div><div style="text-align:right"><div style="font-size:11px;color:#FFD700;font-weight:800">4.9★</div><div style="font-size:8px;color:#4ade80">Active</div></div></div>
+            <div style="background:rgba(255,215,0,0.12);border:1px solid rgba(255,215,0,0.3);border-radius:8px;padding:8px;text-align:center;margin-top:6px"><div style="font-size:10px;font-weight:800;color:#FFD700">+ Invite Driver with Code</div></div>
+          </div>
+          <div class="pnav"><div class="pni on">HOME</div><div class="pni">LOADS</div><div class="pni">MY LOADS</div><div class="pni">REPORTS</div><div class="pni">PROFILE</div></div>
         </div>
-        <div class="phone-nav">
-          <div class="phone-nav-item active">HOME</div>
-          <div class="phone-nav-item">LOADS</div>
-          <div class="phone-nav-item">MY LOADS</div>
-          <div class="phone-nav-item">REPORTS</div>
-          <div class="phone-nav-item">PROFILE</div>
+        <div class="pdots">
+          <div class="pdot on" onclick="goS(0)"></div>
+          <div class="pdot" onclick="goS(1)"></div>
+          <div class="pdot" onclick="goS(2)"></div>
+          <div class="pdot" onclick="goS(3)"></div>
+          <div class="pdot" onclick="goS(4)"></div>
         </div>
+        <div id="plab" class="plab">Owner Dashboard</div>
       </div>
     </div>
   </div>
 </section>
 
 <!-- STATS -->
-<div class="stats-bar">
-  <div class="stats-inner">
-    <div class="stat-item"><div class="stat-num">100+</div><div class="stat-label">Active Drivers</div></div>
-    <div class="stat-item"><div class="stat-num">AI</div><div class="stat-label">Powered Scanning</div></div>
-    <div class="stat-item"><div class="stat-num">$0</div><div class="stat-label">Setup Cost</div></div>
-    <div class="stat-item"><div class="stat-num">🔒</div><div class="stat-label">PIPEDA Compliant</div></div>
-  </div>
+<div class="stats">
+  <div class="stat"><div class="stat-n">100+</div><div class="stat-l">Active Drivers</div></div>
+  <div class="stat"><div class="stat-n">AI</div><div class="stat-l">Powered Scanning</div></div>
+  <div class="stat"><div class="stat-n">$0</div><div class="stat-l">Setup Cost</div></div>
+  <div class="stat"><div class="stat-n">🔒</div><div class="stat-l">PIPEDA Compliant</div></div>
 </div>
 
+<!-- SECTION A: Login + Owner + Driver + Scanner (4 phones) -->
+<section class="pg-section" style="background:linear-gradient(160deg,#0d1a35,#1a2744)">
+  <div class="pg-inner">
+    <div class="pg-title">
+      <div class="stag stag-w">See The App</div>
+      <h2 class="stitle stitle-w">Every screen. Built for you.</h2>
+      <p style="font-size:16px;color:rgba(255,255,255,0.6);max-width:480px;margin:0 auto">From login to payroll — TruckPilot handles everything automatically.</p>
+    </div>
+    <div class="pg-grid-4">
+      <!-- Login -->
+      <div class="ph-wrap">
+        <div class="ph-small">
+          <div class="ph-notch"></div>
+          <div class="ph-screen" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
+            <div style="margin-bottom:16px">
+              <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:28px;letter-spacing:3px;line-height:1;margin-bottom:4px"><span style="color:#fff;text-decoration:underline;text-decoration-color:#FFD700">TRUCK</span><span style="color:#FFD700">PILOT</span></div>
+              <div style="font-size:8px;color:rgba(255,255,255,0.6);letter-spacing:2px;text-transform:uppercase">Log Loads · Save Taxes</div>
+            </div>
+            <div style="width:100%;background:rgba(255,255,255,0.06);border-radius:10px;padding:12px">
+              <div style="display:flex;background:rgba(255,255,255,0.08);border-radius:7px;padding:2px;margin-bottom:10px">
+                <div style="flex:1;text-align:center;background:#fff;border-radius:5px;padding:6px;font-size:10px;font-weight:800;color:#1a2744">Sign In</div>
+                <div style="flex:1;text-align:center;padding:6px;font-size:10px;font-weight:700;color:rgba(255,255,255,0.5)">Create Account</div>
+              </div>
+              <div style="background:rgba(255,255,255,0.08);border-radius:7px;padding:8px;margin-bottom:7px;font-size:9px;color:rgba(255,255,255,0.4)">Email or Username</div>
+              <div style="background:rgba(255,255,255,0.08);border-radius:7px;padding:8px;margin-bottom:10px;font-size:9px;color:rgba(255,255,255,0.4)">Password</div>
+              <div style="background:#243B6E;border-radius:7px;padding:8px;text-align:center;font-size:10px;font-weight:800;color:#fff">→ Sign In</div>
+            </div>
+          </div>
+          <div class="ph-nav"><div class="ph-ni on">HOME</div><div class="ph-ni">LOADS</div><div class="ph-ni">MY LOADS</div><div class="ph-ni">REPORTS</div><div class="ph-ni">PROFILE</div></div>
+        </div>
+        <div class="ph-lbl">Login Screen</div>
+      </div>
+      <!-- Owner Dashboard -->
+      <div class="ph-wrap">
+        <div class="ph-small">
+          <div class="ph-notch"></div>
+          <div class="ph-screen">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:12px;color:#fff">Good Morning 👋</div>
+              <div style="width:22px;height:22px;border-radius:50%;background:#FFD700;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#1a2744">M</div>
+            </div>
+            <div class="scg"><div class="sl">Today's Earnings</div><div class="svg-" style="font-size:20px">$1,480.00</div><div style="font-size:8px;color:#4ade80">↑ 3 loads done</div></div>
+            <div style="display:flex;gap:5px;margin-bottom:6px">
+              <div style="flex:1" class="sc"><div class="sl">Gross</div><div class="svg-" style="font-size:13px">$3.2k</div></div>
+              <div style="flex:1" class="sc"><div class="sl">Drivers</div><div class="sv" style="font-size:14px">4</div></div>
+              <div style="flex:1" class="sc"><div class="sl">Loads</div><div class="sv" style="font-size:14px">28</div></div>
+            </div>
+            <div class="sc" style="display:flex;justify-content:space-between"><div><div style="font-size:9px;font-weight:700;color:#fff">CNRL → Heartland</div><div style="font-size:7px;color:rgba(255,255,255,0.4)">Najeeb · TMW#4821</div></div><div class="svg-" style="font-size:10px">$510</div></div>
+            <div class="sc" style="display:flex;justify-content:space-between"><div><div style="font-size:9px;font-weight:700;color:#fff">Suncor → Heartland</div><div style="font-size:7px;color:rgba(255,255,255,0.4)">Ahmed · TMW#4820</div></div><div class="svg-" style="font-size:10px">$485</div></div>
+          </div>
+          <div class="ph-nav"><div class="ph-ni on">HOME</div><div class="ph-ni">LOADS</div><div class="ph-ni">MY LOADS</div><div class="ph-ni">REPORTS</div><div class="ph-ni">PROFILE</div></div>
+        </div>
+        <div class="ph-lbl">Owner Dashboard</div>
+      </div>
+      <!-- Driver Dashboard -->
+      <div class="ph-wrap">
+        <div class="ph-small">
+          <div class="ph-notch"></div>
+          <div class="ph-screen">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:12px;color:#fff">Hey Najeeb 🚛</div>
+              <div style="width:22px;height:22px;border-radius:50%;background:#FFD700;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;color:#1a2744">N</div>
+            </div>
+            <div class="scg"><div class="sl">My Earnings Today</div><div class="svg-" style="font-size:20px">$510.00</div><div style="font-size:8px;color:rgba(255,255,255,0.5)">1 load completed</div></div>
+            <div style="display:flex;gap:5px;margin-bottom:6px">
+              <div style="flex:1" class="sc"><div class="sl">This Week</div><div class="svg-" style="font-size:12px">$2,840</div></div>
+              <div style="flex:1" class="sc"><div class="sl">Loads</div><div class="sv" style="font-size:14px">12</div></div>
+            </div>
+            <div class="scgr"><div class="sl">Latest Load</div><div style="font-size:10px;font-weight:700;color:#fff">CNRL → Heartland</div><div style="font-size:8px;color:rgba(255,255,255,0.4)">TMW#4821 · ✅ Done</div></div>
+            <div class="sc"><div class="sl">Wait Time Pay</div><div style="font-size:10px;font-weight:700;color:#4ade80">+ $45.00</div><div style="font-size:8px;color:rgba(255,255,255,0.4)">1.5hrs × $30/hr</div></div>
+          </div>
+          <div class="ph-nav"><div class="ph-ni on">HOME</div><div class="ph-ni">LOADS</div><div class="ph-ni">MY LOADS</div><div class="ph-ni">REPORTS</div><div class="ph-ni">PROFILE</div></div>
+        </div>
+        <div class="ph-lbl">Driver Dashboard</div>
+      </div>
+      <!-- AI Scanner -->
+      <div class="ph-wrap">
+        <div class="ph-small">
+          <div class="ph-notch"></div>
+          <div class="ph-screen">
+            <div class="sh">📷 AI LOAD SCANNER</div>
+            <div class="ss">Scan any dispatch sheet</div>
+            <div style="background:rgba(255,215,0,0.08);border:2px dashed rgba(255,215,0,0.3);border-radius:10px;padding:12px;text-align:center;margin-bottom:8px">
+              <div style="font-size:20px;margin-bottom:4px">📄</div>
+              <div style="font-size:9px;font-weight:800;color:#FFD700">🤖 Reading...</div>
+              <div style="width:100%;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;margin-top:6px;overflow:hidden"><div style="width:60%;height:100%;background:#FFD700;border-radius:2px;animation:scan-p 1.5s ease-in-out infinite"></div></div>
+            </div>
+            <div class="scgr"><div class="sl">✅ TMW</div><div class="svg-" style="font-size:15px">TMW-48291</div></div>
+            <div style="display:flex;gap:5px">
+              <div style="flex:1" class="scgr"><div class="sl">✅ FROM</div><div style="font-size:11px;font-weight:800;color:#fff">CNRL</div></div>
+              <div style="flex:1" class="scgr"><div class="sl">✅ TO</div><div style="font-size:11px;font-weight:800;color:#fff">Heartland</div></div>
+            </div>
+          </div>
+          <div class="ph-nav"><div class="ph-ni">HOME</div><div class="ph-ni on">LOADS</div><div class="ph-ni">MY LOADS</div><div class="ph-ni">REPORTS</div><div class="ph-ni">PROFILE</div></div>
+        </div>
+        <div class="ph-lbl">AI Load Scanner</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- FEATURES -->
-<section class="section" id="features">
-  <div class="section-inner">
-    <div class="section-tag">Everything You Need</div>
-    <h2 class="section-title">One app.<br>Zero paperwork.</h2>
-    <p class="section-sub">Everything runs automatically — from scanning dispatch sheets to generating your CRA tax report.</p>
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">📦</div>
-        <div class="feature-title">AI Load Scanner</div>
-        <p class="feature-desc">Take a photo of any dispatch sheet — printed or handwritten — and every field fills in automatically. TMW#, route, wait times, truck number. Done in seconds.</p>
+<section class="section" id="features" style="background:var(--bg)">
+  <div class="sec-inner">
+    <div class="stag">Everything You Need</div>
+    <h2 class="stitle">One app. Zero paperwork.</h2>
+    <p class="ssub">Everything runs automatically — from scanning dispatch sheets to generating your CRA tax report.</p>
+    <div class="feat-grid">
+      <div class="feat-card"><div class="feat-icon">📦</div><div class="feat-t">AI Load Scanner</div><p class="feat-d">Take a photo of any dispatch sheet — printed or handwritten — and every field fills in automatically.</p></div>
+      <div class="feat-card"><div class="feat-icon">💰</div><div class="feat-t">Pay Tracking</div><p class="feat-d">See exactly what you earned per load including wait time pay. Your money tracked to the cent.</p></div>
+      <div class="feat-card"><div class="feat-icon">🧾</div><div class="feat-t">Expense & Tax</div><p class="feat-d">Scan receipts with AI and auto-categorize by CRA tax line. Tax season handled before it starts.</p></div>
+      <div class="feat-card"><div class="feat-icon">👥</div><div class="feat-t">Fleet Management</div><p class="feat-d">Assign loads, manage drivers, set custom pay rates and track payroll — all in one dashboard.</p></div>
+      <div class="feat-card"><div class="feat-icon">📋</div><div class="feat-t">Financial Reports</div><p class="feat-d">Income statements, CRA T2125, IFTA fuel reports and payroll summaries — all as PDF.</p></div>
+      <div class="feat-card"><div class="feat-icon">🔧</div><div class="feat-t">Maintenance Tracker</div><p class="feat-d">Track maintenance, set inspection reminders and document everything. Stay compliant.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION B: My Loads + Expenses + Payroll (3 phones) -->
+<section class="pg-section" style="background:#fff">
+  <div class="pg-inner">
+    <div class="pg-title">
+      <div class="stag">Track Everything</div>
+      <h2 class="stitle">Your money. Your records.</h2>
+    </div>
+    <div class="pg-grid-3">
+      <!-- My Loads -->
+      <div class="ph-wrap">
+        <div class="ph-small">
+          <div class="ph-notch"></div>
+          <div class="ph-screen">
+            <div class="sh">📋 MY LOADS</div>
+            <div class="ss">March 2026 · 28 loads</div>
+            <div class="sc" style="display:flex;justify-content:space-between;border-left:3px solid #4ade80"><div><div style="font-size:9px;font-weight:700;color:#fff">CNRL → Heartland</div><div style="font-size:7px;color:rgba(255,255,255,0.4)">Mar 19 · ✅ Done</div></div><div class="svg-" style="font-size:10px">$510</div></div>
+            <div class="sc" style="display:flex;justify-content:space-between;border-left:3px solid #4ade80"><div><div style="font-size:9px;font-weight:700;color:#fff">Suncor → Heartland</div><div style="font-size:7px;color:rgba(255,255,255,0.4)">Mar 18 · ✅ Done</div></div><div class="svg-" style="font-size:10px">$485</div></div>
+            <div class="sc" style="display:flex;justify-content:space-between;border-left:3px solid #FFD700"><div><div style="font-size:9px;font-weight:700;color:#fff">CNRL → Heartland</div><div style="font-size:7px;color:rgba(255,255,255,0.4)">Mar 18 · 🔄 Active</div></div><div class="svg-" style="font-size:10px">$510</div></div>
+            <div class="scg" style="margin-top:6px"><div class="sl">Month Total</div><div class="svg-" style="font-size:18px">$14,280.00</div></div>
+          </div>
+          <div class="ph-nav"><div class="ph-ni">HOME</div><div class="ph-ni">LOADS</div><div class="ph-ni on">MY LOADS</div><div class="ph-ni">REPORTS</div><div class="ph-ni">PROFILE</div></div>
+        </div>
+        <div class="ph-lbl">My Loads</div>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">💰</div>
-        <div class="feature-title">Pay Tracking</div>
-        <p class="feature-desc">See exactly what you earned per load including wait time pay. Every dollar tracked automatically. No spreadsheets, no manual calculations.</p>
+      <!-- Expenses -->
+      <div class="ph-wrap">
+        <div class="ph-small">
+          <div class="ph-notch"></div>
+          <div class="ph-screen">
+            <div class="sh">🧾 EXPENSES</div>
+            <div class="ss">March 2026 · AI-tracked</div>
+            <div class="scg"><div class="sl">Total Expenses</div><div class="svg-" style="font-size:18px">$3,240.00</div><div style="font-size:8px;color:rgba(255,255,255,0.5)">12 receipts scanned</div></div>
+            <div class="sc" style="display:flex;justify-content:space-between"><span style="font-size:9px;color:rgba(255,255,255,0.7)">⛽ Fuel</span><span style="font-size:10px;font-weight:800;color:#ff8a80">$1,840</span></div>
+            <div class="sc" style="display:flex;justify-content:space-between"><span style="font-size:9px;color:rgba(255,255,255,0.7)">🔧 Maintenance</span><span style="font-size:10px;font-weight:800;color:#ff8a80">$680</span></div>
+            <div class="sc" style="display:flex;justify-content:space-between"><span style="font-size:9px;color:rgba(255,255,255,0.7)">🍔 Meals</span><span style="font-size:10px;font-weight:800;color:#ff8a80">$420</span></div>
+            <div style="background:rgba(255,215,0,0.12);border-radius:8px;padding:7px;text-align:center;margin-top:5px"><div style="font-size:9px;font-weight:800;color:#FFD700">📷 Scan Receipt with AI</div></div>
+          </div>
+          <div class="ph-nav"><div class="ph-ni">HOME</div><div class="ph-ni">LOADS</div><div class="ph-ni">MY LOADS</div><div class="ph-ni">REPORTS</div><div class="ph-ni on">PROFILE</div></div>
+        </div>
+        <div class="ph-lbl">Expenses</div>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">🧾</div>
-        <div class="feature-title">Expense & Tax</div>
-        <p class="feature-desc">Scan receipts with AI and we auto-categorize everything by CRA tax line. Tax season is handled before it even starts.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">👥</div>
-        <div class="feature-title">Fleet Management</div>
-        <p class="feature-desc">Assign loads, manage drivers, set custom pay rates per route and track payroll — all from one dashboard built for Canadian owner-operators.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">📋</div>
-        <div class="feature-title">Financial Reports</div>
-        <p class="feature-desc">Income statements, CRA T2125, IFTA fuel reports and payroll summaries — all auto-generated and downloadable as professional PDFs.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🔧</div>
-        <div class="feature-title">Maintenance Tracker</div>
-        <p class="feature-desc">Track truck maintenance, set inspection reminders and document everything in one place. Stay compliant and avoid costly breakdowns.</p>
+      <!-- Payroll -->
+      <div class="ph-wrap">
+        <div class="ph-small">
+          <div class="ph-notch"></div>
+          <div class="ph-screen">
+            <div class="sh">💵 PAYROLL</div>
+            <div class="ss">March 2026 · 4 drivers</div>
+            <div class="scg"><div class="sl">Total Payroll</div><div class="svg-" style="font-size:18px">$8,420.00</div></div>
+            <div class="sc" style="display:flex;align-items:center;gap:6px"><div style="width:22px;height:22px;border-radius:50%;background:#243B6E;display:flex;align-items:center;justify-content:center;font-weight:900;color:#FFD700;font-size:9px;flex-shrink:0">N</div><div style="flex:1"><div style="font-size:9px;font-weight:700;color:#fff">Najeeb A.</div><div style="font-size:7px;color:rgba(255,255,255,0.4)">12 loads</div></div><div class="svgr" style="font-size:11px">$2,840</div></div>
+            <div class="sc" style="display:flex;align-items:center;gap:6px"><div style="width:22px;height:22px;border-radius:50%;background:#243B6E;display:flex;align-items:center;justify-content:center;font-weight:900;color:#FFD700;font-size:9px;flex-shrink:0">A</div><div style="flex:1"><div style="font-size:9px;font-weight:700;color:#fff">Ahmed K.</div><div style="font-size:7px;color:rgba(255,255,255,0.4)">10 loads</div></div><div class="svgr" style="font-size:11px">$2,380</div></div>
+            <div class="sc" style="display:flex;align-items:center;gap:6px"><div style="width:22px;height:22px;border-radius:50%;background:#243B6E;display:flex;align-items:center;justify-content:center;font-weight:900;color:#FFD700;font-size:9px;flex-shrink:0">O</div><div style="flex:1"><div style="font-size:9px;font-weight:700;color:#fff">Omar S.</div><div style="font-size:7px;color:rgba(255,255,255,0.4)">14 loads</div></div><div class="svgr" style="font-size:11px">$3,200</div></div>
+            <div style="background:#243B6E;border-radius:8px;padding:7px;text-align:center;margin-top:5px"><div style="font-size:9px;font-weight:800;color:#FFD700">⬇️ Download PDF</div></div>
+          </div>
+          <div class="ph-nav"><div class="ph-ni">HOME</div><div class="ph-ni">LOADS</div><div class="ph-ni">MY LOADS</div><div class="ph-ni">REPORTS</div><div class="ph-ni on">PROFILE</div></div>
+        </div>
+        <div class="ph-lbl">Payroll</div>
       </div>
     </div>
   </div>
 </section>
 
 <!-- HOW IT WORKS -->
-<section class="how-section" id="how">
-  <div class="how-inner">
-    <div class="section-tag">Simple Process</div>
-    <h2 class="section-title" style="color:#fff;">How It Works</h2>
-    <p class="section-sub">Three steps. That's literally it.</p>
-    <div class="steps-grid">
-      <div class="step-card">
-        <div class="step-num">1</div>
-        <div class="step-title">Sign In</div>
-        <p class="step-desc">Create your account in seconds. Face recognition available for instant, passwordless access every time.</p>
-        <div class="step-connector"></div>
-      </div>
-      <div class="step-card">
-        <div class="step-num">2</div>
-        <div class="step-title">Scan & Drive</div>
-        <p class="step-desc">Take a photo of your dispatch sheet. AI reads it — printed or handwritten — and fills everything in. You just drive.</p>
-        <div class="step-connector"></div>
-      </div>
-      <div class="step-card">
-        <div class="step-num">3</div>
-        <div class="step-title">Sign Out</div>
-        <p class="step-desc">That's it. Reports, taxes, payroll — all generated automatically in the background. You don't lift a finger.</p>
-      </div>
+<section class="how" id="how">
+  <div class="sec-inner">
+    <div class="stag stag-w">Simple Process</div>
+    <h2 class="stitle stitle-w">How It Works</h2>
+    <p class="ssub ssub-w">Three steps. That's it.</p>
+    <div class="steps">
+      <div><div class="step-n">1</div><div class="step-t">Sign In</div><p class="step-d">Create your account in seconds. Face recognition available for instant access every time.</p></div>
+      <div><div class="step-n">2</div><div class="step-t">Scan & Drive</div><p class="step-d">Take a photo of your dispatch sheet. AI reads it — printed or handwritten — and fills everything in.</p></div>
+      <div><div class="step-n">3</div><div class="step-t">Sign Out</div><p class="step-d">That's it. Reports, taxes, payroll — all generated automatically in the background.</p></div>
     </div>
   </div>
 </section>
 
 <!-- SECURITY -->
-<section class="security-section">
-  <div class="security-inner">
-    <div>
-      <div class="section-tag">Your Data is Safe</div>
-      <h2 class="section-title">Protected by<br>Canadian Law.</h2>
-      <p class="section-sub">We take your privacy as seriously as you take your routes.</p>
-      <div class="security-points">
-        <div class="security-point">
-          <div class="security-point-icon">🔐</div>
-          <div>
-            <div class="security-point-title">End-to-End Encryption</div>
-            <div class="security-point-desc">All your data is encrypted in transit and at rest. Nobody can access it without your permission.</div>
-          </div>
-        </div>
-        <div class="security-point">
-          <div class="security-point-icon">🚫</div>
-          <div>
-            <div class="security-point-title">We Never Sell Your Data</div>
-            <div class="security-point-desc">Your information is yours. We do not share, sell, or use your data for advertising.</div>
-          </div>
-        </div>
-        <div class="security-point">
-          <div class="security-point-icon">📤</div>
-          <div>
-            <div class="security-point-title">Export or Delete Anytime</div>
-            <div class="security-point-desc">Download all your data as CSV or permanently delete your account at any time from the app.</div>
-          </div>
+<section class="section" style="background:var(--bg)">
+  <div class="sec-inner">
+    <div class="sec-grid">
+      <div>
+        <div class="stag">Your Data is Safe</div>
+        <h2 class="stitle">Protected by Canadian Law.</h2>
+        <p class="ssub">We take your privacy as seriously as you take your routes.</p>
+        <div class="sec-pts">
+          <div class="sec-pt"><div class="sec-pt-icon">🔐</div><div><div class="sec-pt-t">End-to-End Encryption</div><div class="sec-pt-d">All your data is encrypted in transit and at rest.</div></div></div>
+          <div class="sec-pt"><div class="sec-pt-icon">🚫</div><div><div class="sec-pt-t">We Never Sell Your Data</div><div class="sec-pt-d">Your information is yours. We never share or sell it.</div></div></div>
+          <div class="sec-pt"><div class="sec-pt-icon">📤</div><div><div class="sec-pt-t">Export or Delete Anytime</div><div class="sec-pt-d">Download all your data or permanently delete your account.</div></div></div>
         </div>
       </div>
-    </div>
-    <div class="pipeda-card">
-      <div class="pipeda-flag">🇨🇦</div>
-      <div class="pipeda-title">Fully Compliant with <span>PIPEDA</span></div>
-      <p class="pipeda-desc">Canada's Personal Information Protection and Electronic Documents Act governs how we collect, use and disclose your personal information. TruckPilot meets every requirement.</p>
-      <div class="pipeda-checks">
-        <div class="pipeda-check"><div class="check-dot">✓</div>No GPS tracking without consent</div>
-        <div class="pipeda-check"><div class="check-dot">✓</div>Data stored on Canadian servers</div>
-        <div class="pipeda-check"><div class="check-dot">✓</div>Transparent data practices</div>
-        <div class="pipeda-check"><div class="check-dot">✓</div>Right to access your information</div>
+      <div class="pip-card">
+        <div style="font-size:36px;margin-bottom:12px">🇨🇦</div>
+        <div class="pip-title">Fully Compliant with <span>PIPEDA</span></div>
+        <p style="font-size:14px;color:rgba(255,255,255,0.65);line-height:1.7;margin-bottom:16px">Canada's Personal Information Protection and Electronic Documents Act. TruckPilot meets every requirement.</p>
+        <div class="pip-checks">
+          <div class="pip-check"><div class="chk">✓</div>No GPS tracking without consent</div>
+          <div class="pip-check"><div class="chk">✓</div>Data stored on Canadian servers</div>
+          <div class="pip-check"><div class="chk">✓</div>Transparent data practices</div>
+          <div class="pip-check"><div class="chk">✓</div>Right to access your information</div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- PLANS -->
-<section class="plans-section" id="plans">
-  <div class="plans-inner">
-    <div style="text-align:center; margin-bottom:56px;">
-      <div class="section-tag" style="text-align:center;">Simple Pricing</div>
-      <h2 class="section-title" style="text-align:center;">Plans for Every Trucker</h2>
-      <p class="section-sub" style="text-align:center; margin:0 auto;">Start free during beta. Upgrade when you're ready.</p>
+<!-- SECTION C: Tax + Reports + Drivers + Profile (4 phones) -->
+<section class="pg-section" style="background:linear-gradient(160deg,#0d1a35,#1a2744)">
+  <div class="pg-inner">
+    <div class="pg-title">
+      <div class="stag stag-w">More Features</div>
+      <h2 class="stitle stitle-w">Built for owners. Built for drivers.</h2>
     </div>
-    <div class="plans-grid">
-      <div class="plan-card">
-        <div class="plan-badge">⭐ STARTER</div>
-        <div class="plan-name">Beta</div>
-        <div class="plan-price">Free<sub>/mo</sub></div>
-        <hr class="plan-divider">
-        <ul class="plan-features">
-          <li><div class="plan-check">✓</div>Load logging & tracking</li>
-          <li><div class="plan-check">✓</div>Pay calculations</li>
-          <li><div class="plan-check">✓</div>AI receipt scanning</li>
-          <li><div class="plan-check">✓</div>Basic reports</li>
-          <li><div class="plan-check">✓</div>Document storage</li>
-        </ul>
-        <a href="https://app.truckpilot.ca" class="plan-btn plan-btn-navy">Get Started Free</a>
+    <div class="pg-grid-4">
+      <!-- Tax -->
+      <div class="ph-wrap">
+        <div class="ph-small">
+          <div class="ph-notch"></div>
+          <div class="ph-screen">
+            <div class="sh">🗂 CRA T2125</div>
+            <div class="ss">Full Year 2025</div>
+            <div class="sc" style="display:flex;justify-content:space-between"><span style="font-size:8px;color:rgba(255,255,255,0.5)">Revenue (L.8000)</span><span style="font-size:9px;font-weight:800;color:#fff">$87,420</span></div>
+            <div class="sc" style="display:flex;justify-content:space-between"><span style="font-size:8px;color:rgba(255,255,255,0.5)">Fuel (L.9220)</span><span style="font-size:9px;font-weight:800;color:#ff8a80">-$12,840</span></div>
+            <div class="sc" style="display:flex;justify-content:space-between"><span style="font-size:8px;color:rgba(255,255,255,0.5)">Maintenance (L.9281)</span><span style="font-size:9px;font-weight:800;color:#ff8a80">-$4,200</span></div>
+            <div class="sc" style="display:flex;justify-content:space-between"><span style="font-size:8px;color:rgba(255,255,255,0.5)">Meals (L.8523)</span><span style="font-size:9px;font-weight:800;color:#ff8a80">-$2,100</span></div>
+            <div class="scg" style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:9px;font-weight:800;color:#FFD700">NET INCOME</span><span class="svg-" style="font-size:14px">$68,280</span></div>
+            <div style="background:#243B6E;border-radius:7px;padding:7px;text-align:center"><div style="font-size:9px;font-weight:800;color:#FFD700">⬇️ Export for Accountant</div></div>
+          </div>
+          <div class="ph-nav"><div class="ph-ni">HOME</div><div class="ph-ni">LOADS</div><div class="ph-ni">MY LOADS</div><div class="ph-ni">REPORTS</div><div class="ph-ni on">PROFILE</div></div>
+        </div>
+        <div class="ph-lbl">Tax Report</div>
       </div>
-      <div class="plan-card featured">
-        <div class="plan-popular">Most Popular</div>
-        <div class="plan-badge">💼 HAULER</div>
-        <div class="plan-name">Hauler</div>
-        <div class="plan-price"><sup>$</sup>9.99<sub>/mo</sub></div>
-        <hr class="plan-divider">
-        <ul class="plan-features">
-          <li><div class="plan-check">✓</div>Everything in Beta</li>
-          <li><div class="plan-check">✓</div>Up to 3 drivers</li>
-          <li><div class="plan-check">✓</div>Payroll summaries</li>
-          <li><div class="plan-check">✓</div>Tax export (CRA T2125)</li>
-          <li><div class="plan-check">✓</div>Analytics dashboard</li>
-        </ul>
-        <a href="https://app.truckpilot.ca" class="plan-btn plan-btn-gold">Start Hauler Plan</a>
+      <!-- Reports -->
+      <div class="ph-wrap">
+        <div class="ph-small">
+          <div class="ph-notch"></div>
+          <div class="ph-screen">
+            <div class="sh">📊 REPORTS</div>
+            <div class="ss">2025 Full Year</div>
+            <div class="scg"><div class="sl">Total Revenue</div><div class="svg-" style="font-size:18px">$87,420.00</div><div style="font-size:8px;color:#4ade80">↑ 18% vs last year</div></div>
+            <div style="display:flex;gap:5px;margin-bottom:6px">
+              <div style="flex:1" class="sc"><div class="sl">Loads</div><div class="sv" style="font-size:16px">184</div></div>
+              <div style="flex:1" class="sc"><div class="sl">Net</div><div class="svgr" style="font-size:14px">$68k</div></div>
+            </div>
+            <div class="sc">
+              <div class="sl" style="margin-bottom:5px">Monthly</div>
+              <div style="display:flex;align-items:flex-end;gap:3px;height:30px">
+                <div style="flex:1;background:#243B6E;border-radius:2px;height:55%"></div>
+                <div style="flex:1;background:#243B6E;border-radius:2px;height:70%"></div>
+                <div style="flex:1;background:#243B6E;border-radius:2px;height:50%"></div>
+                <div style="flex:1;background:#243B6E;border-radius:2px;height:85%"></div>
+                <div style="flex:1;background:#243B6E;border-radius:2px;height:65%"></div>
+                <div style="flex:1;background:#FFD700;border-radius:2px;height:100%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="ph-nav"><div class="ph-ni">HOME</div><div class="ph-ni">LOADS</div><div class="ph-ni">MY LOADS</div><div class="ph-ni on">REPORTS</div><div class="ph-ni">PROFILE</div></div>
+        </div>
+        <div class="ph-lbl">Analytics</div>
       </div>
-      <div class="plan-card">
-        <div class="plan-badge">🚀 OWNER OPERATORS</div>
-        <div class="plan-name">Owner Pro</div>
-        <div class="plan-price"><sup>$</sup>24.99<sub>/mo</sub></div>
-        <hr class="plan-divider">
-        <ul class="plan-features">
-          <li><div class="plan-check">✓</div>Everything in Hauler</li>
-          <li><div class="plan-check">✓</div>Unlimited drivers</li>
-          <li><div class="plan-check">✓</div>IFTA fuel tax reports</li>
-          <li><div class="plan-check">✓</div>Financial statements</li>
-          <li><div class="plan-check">✓</div>Priority support</li>
-        </ul>
-        <a href="https://app.truckpilot.ca" class="plan-btn plan-btn-navy">Start Owner Pro</a>
+      <!-- Drivers -->
+      <div class="ph-wrap">
+        <div class="ph-small">
+          <div class="ph-notch"></div>
+          <div class="ph-screen">
+            <div class="sh">👥 MY DRIVERS</div>
+            <div class="ss">Fleet · 4 active</div>
+            <div class="sc" style="display:flex;align-items:center;gap:6px"><div style="width:26px;height:26px;border-radius:50%;background:#243B6E;display:flex;align-items:center;justify-content:center;font-weight:900;color:#FFD700;font-size:11px;flex-shrink:0">N</div><div style="flex:1"><div style="font-size:10px;font-weight:700;color:#fff">Najeeb A.</div><div style="font-size:7px;color:rgba(255,255,255,0.4)">12 loads · $2,840</div></div><div style="text-align:right"><div style="font-size:10px;color:#FFD700;font-weight:800">5.0★</div><div style="font-size:7px;color:#4ade80">Active</div></div></div>
+            <div class="sc" style="display:flex;align-items:center;gap:6px"><div style="width:26px;height:26px;border-radius:50%;background:#243B6E;display:flex;align-items:center;justify-content:center;font-weight:900;color:#FFD700;font-size:11px;flex-shrink:0">A</div><div style="flex:1"><div style="font-size:10px;font-weight:700;color:#fff">Ahmed K.</div><div style="font-size:7px;color:rgba(255,255,255,0.4)">10 loads · $2,380</div></div><div style="text-align:right"><div style="font-size:10px;color:#FFD700;font-weight:800">4.8★</div><div style="font-size:7px;color:#4ade80">Active</div></div></div>
+            <div class="sc" style="display:flex;align-items:center;gap:6px"><div style="width:26px;height:26px;border-radius:50%;background:#243B6E;display:flex;align-items:center;justify-content:center;font-weight:900;color:#FFD700;font-size:11px;flex-shrink:0">O</div><div style="flex:1"><div style="font-size:10px;font-weight:700;color:#fff">Omar S.</div><div style="font-size:7px;color:rgba(255,255,255,0.4)">14 loads · $3,200</div></div><div style="text-align:right"><div style="font-size:10px;color:#FFD700;font-weight:800">4.9★</div><div style="font-size:7px;color:#4ade80">Active</div></div></div>
+            <div style="background:rgba(255,215,0,0.12);border:1px solid rgba(255,215,0,0.3);border-radius:7px;padding:7px;text-align:center;margin-top:5px"><div style="font-size:9px;font-weight:800;color:#FFD700">+ Invite Driver</div></div>
+          </div>
+          <div class="ph-nav"><div class="ph-ni">HOME</div><div class="ph-ni">LOADS</div><div class="ph-ni">MY LOADS</div><div class="ph-ni">REPORTS</div><div class="ph-ni on">PROFILE</div></div>
+        </div>
+        <div class="ph-lbl">Driver Management</div>
+      </div>
+      <!-- Profile -->
+      <div class="ph-wrap">
+        <div class="ph-small">
+          <div class="ph-notch"></div>
+          <div class="ph-screen">
+            <div style="text-align:center;margin-bottom:10px">
+              <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#243B6E,#FFD700);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:18px;color:#fff;margin:0 auto 5px">M</div>
+              <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:14px;color:#fff">Mohamed W.</div>
+              <div style="font-size:8px;color:#FFD700;margin-top:2px">⭐ Beta · Fleet Owner</div>
+            </div>
+            <div style="display:flex;gap:5px;margin-bottom:6px">
+              <div style="flex:1" class="sc"><div class="sl">Loads</div><div class="sv" style="font-size:14px">184</div></div>
+              <div style="flex:1" class="sc"><div class="sl">Rating</div><div class="svg-" style="font-size:14px">4.9★</div></div>
+              <div style="flex:1" class="sc"><div class="sl">Plan</div><div style="font-size:9px;font-weight:800;color:#FFD700">Beta</div></div>
+            </div>
+            <div class="sc" style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:10px;color:#fff">🤖 TruckPilot AI</span><span style="font-size:9px;color:rgba(255,255,255,0.4)">›</span></div>
+            <div class="sc" style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:10px;color:#fff">📋 Financial Reports</span><span style="font-size:9px;color:rgba(255,255,255,0.4)">›</span></div>
+            <div class="sc" style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:10px;color:#fff">🔒 Privacy & Security</span><span style="font-size:9px;color:rgba(255,255,255,0.4)">›</span></div>
+          </div>
+          <div class="ph-nav"><div class="ph-ni">HOME</div><div class="ph-ni">LOADS</div><div class="ph-ni">MY LOADS</div><div class="ph-ni">REPORTS</div><div class="ph-ni on">PROFILE</div></div>
+        </div>
+        <div class="ph-lbl">Profile</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- APPLY / JOIN CTA -->
-<section class="apply-section" id="apply">
+<!-- BETA / PRICING -->
+<section class="beta-sec" id="plans">
+  <div class="beta-inner">
+    <div class="stag" style="text-align:center">Beta Access</div>
+    <h2 class="stitle" style="text-align:center;font-size:44px">Everything is Free.<br>Right Now.</h2>
+    <p style="font-size:16px;color:#666;line-height:1.7;margin-bottom:40px">Join now and get full access to every feature. No credit card. No limits. Plans launch later this year.</p>
+    <div class="beta-card">
+      <div style="font-size:44px;margin-bottom:14px">🆓</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:48px;font-weight:900;color:#FFD700;line-height:1;margin-bottom:12px">FREE BETA ACCESS</div>
+      <div style="font-size:16px;color:rgba(255,255,255,0.7);margin-bottom:28px;line-height:1.7">Every feature. Every tool. Zero cost.</div>
+      <div class="beta-feat">
+        <div class="beta-feat-item"><div style="font-size:20px;margin-bottom:6px">📦</div><div style="font-size:11px;font-weight:700;color:#fff">AI Load Scanner</div></div>
+        <div class="beta-feat-item"><div style="font-size:20px;margin-bottom:6px">💰</div><div style="font-size:11px;font-weight:700;color:#fff">Pay Tracking</div></div>
+        <div class="beta-feat-item"><div style="font-size:20px;margin-bottom:6px">🧾</div><div style="font-size:11px;font-weight:700;color:#fff">Expenses & Tax</div></div>
+        <div class="beta-feat-item"><div style="font-size:20px;margin-bottom:6px">👥</div><div style="font-size:11px;font-weight:700;color:#fff">Fleet Management</div></div>
+        <div class="beta-feat-item"><div style="font-size:20px;margin-bottom:6px">📋</div><div style="font-size:11px;font-weight:700;color:#fff">Financial Reports</div></div>
+        <div class="beta-feat-item"><div style="font-size:20px;margin-bottom:6px">🔧</div><div style="font-size:11px;font-weight:700;color:#fff">Maintenance</div></div>
+      </div>
+      <a href="get-started.html" style="background:#FFD700;color:#1a2744;font-weight:900;font-size:17px;padding:16px 44px;border-radius:50px;text-decoration:none;display:inline-block">🚛 Join Free Now</a>
+      <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:14px">No credit card · No commitment · Cancel anytime</div>
+    </div>
+    <div style="background:#FFF8E1;border:1px solid #FFD700;border-radius:14px;padding:18px 20px">
+      <div style="font-size:14px;color:#92400e;font-weight:700">💡 Paid plans coming later this year. Beta members get an exclusive early discount.</div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section" style="background:#fff">
+  <div class="sec-inner">
+    <div style="text-align:center;margin-bottom:48px">
+      <div class="stag" style="text-align:center">What Truckers Say</div>
+      <h2 class="stitle" style="text-align:center">Real drivers. Real results.</h2>
+    </div>
+    <div class="test-grid">
+      <div class="test-card">
+        <div class="test-stars">★★★★★</div>
+        <p class="test-text">"I used to spend Sunday nights doing paperwork. Now I just scan my dispatch sheets and TruckPilot does everything. My accountant was impressed."</p>
+        <div style="display:flex;align-items:center;gap:10px"><div class="test-av">N</div><div><div class="test-name">Najeeb A.</div><div class="test-role">Owner Operator · Fort McMurray</div></div></div>
+      </div>
+      <div class="test-card">
+        <div class="test-stars">★★★★★</div>
+        <p class="test-text">"Managing 4 drivers used to be a nightmare. Now I can see every load, every driver's pay and send payroll reports in seconds. Game changer."</p>
+        <div style="display:flex;align-items:center;gap:10px"><div class="test-av">M</div><div><div class="test-name">Mohamed W.</div><div class="test-role">Fleet Owner · Alberta</div></div></div>
+      </div>
+      <div class="test-card">
+        <div class="test-stars">★★★★★</div>
+        <p class="test-text">"The AI receipt scanner is unreal. I just take a photo and it fills everything in — even handwritten ones. Tax season is no longer stressful."</p>
+        <div style="display:flex;align-items:center;gap:10px"><div class="test-av">A</div><div><div class="test-name">Ahmed K.</div><div class="test-role">Driver · Edmonton</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="apply">
   <div class="apply-inner">
-    <div class="section-tag">Join TruckPilot</div>
-    <h2 class="apply-title">Ready to<br><span>simplify</span><br>your fleet?</h2>
-    <p class="apply-sub">Enter your email and we'll send you everything you need to get started. No setup fees. No contracts. Cancel anytime.</p>
-    <form class="apply-form" onsubmit="handleApply(event)">
-      <input type="email" class="apply-input" placeholder="your@email.com" required id="apply-email">
-      <button type="submit" class="apply-btn-submit">Get Started →</button>
+    <div class="stag stag-w" style="text-align:center">Join TruckPilot</div>
+    <h2 class="apply-t">Ready to<br><span>simplify</span><br>your fleet?</h2>
+    <p style="font-size:16px;color:rgba(255,255,255,0.65);margin-bottom:32px;line-height:1.7">No setup fees. No credit card. No contracts. Just sign in and go.</p>
+    <a href="get-started.html" class="btn-gold" style="font-size:17px;padding:17px 44px;display:inline-block">🚛 Get Started Free</a>
+    <p style="font-size:13px;color:rgba(255,255,255,0.4);margin-top:14px">Or open directly at <a href="https://app.truckpilot.ca" style="color:rgba(255,215,0,0.7);text-decoration:none">app.truckpilot.ca</a></p>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-sec" id="contact">
+  <div class="contact-inner">
+    <div class="stag" style="text-align:center">Get In Touch</div>
+    <h2 class="stitle" style="text-align:center;font-size:40px;margin-bottom:12px">We're here to help</h2>
+    <p style="font-size:15px;color:#666;margin-bottom:36px;line-height:1.7">Have a question? Send us a message and we'll get back to you within a few hours.</p>
+    <form onsubmit="handleContact(event)" style="text-align:left">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:0">
+        <input type="text" id="cn" required placeholder="Your Name" class="cinput">
+        <input type="email" id="ce" required placeholder="your@email.com" class="cinput">
+      </div>
+      <select id="cs" class="csel">
+        <option>General Question</option>
+        <option>Technical Support</option>
+        <option>Billing / Plans</option>
+        <option>Fleet Setup Help</option>
+        <option>Other</option>
+      </select>
+      <textarea id="cm" required rows="4" placeholder="How can we help you?" class="ctarea"></textarea>
+      <button type="submit" id="csub" class="csubmit">Send Message →</button>
+      <div id="csuc" style="display:none;margin-top:14px;padding:14px;background:#E8F5E9;border-radius:10px;text-align:center;color:#2E7D32;font-weight:700">✅ Message sent! We'll get back to you shortly.</div>
     </form>
-    <p class="apply-note">Or open the app directly at <a href="https://app.truckpilot.ca" style="color:rgba(255,215,0,0.7);text-decoration:none;">app.truckpilot.ca</a></p>
-    <p class="apply-or">— or —</p>
-    <a href="https://app.truckpilot.ca" class="btn-gold" style="display:inline-flex;">🚛 Open TruckPilot Now</a>
   </div>
 </section>
 
 <!-- FOOTER -->
-<footer id="contact">
-  <div class="footer-inner">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <a href="#" class="logo">
-          <span class="logo-truck">TRUCK</span><span class="logo-pilot">PILOT</span>
-        </a>
-        <p>Canada's smartest fleet management app — built exclusively for truckers and owner-operators.</p>
+<footer>
+  <div class="foot-inner">
+    <div class="foot-grid">
+      <div>
+        <a href="#" class="logo" style="margin-bottom:14px;display:inline-flex"><span class="lt">TRUCK</span><span class="lp">PILOT</span></a>
+        <p style="font-size:14px;color:rgba(255,255,255,0.4);line-height:1.7;max-width:240px;margin-top:12px">Canada's smartest fleet management app — built for truckers and owner-operators.</p>
       </div>
-      <div class="footer-col">
-        <h4>Product</h4>
-        <a href="#features">Features</a>
-        <a href="#how">How It Works</a>
-        <a href="#plans">Pricing</a>
-        <a href="https://app.truckpilot.ca">Open App</a>
-      </div>
-      <div class="footer-col">
-        <h4>Legal</h4>
-        <a href="/privacy">Privacy Policy</a>
-        <a href="/terms">Terms of Service</a>
-        <a href="/cookies">Cookie Policy</a>
-      </div>
-      <div class="footer-col">
-        <h4>Contact</h4>
-        <a href="tel:4377005835">📞 437-700-5835</a>
-        <a href="mailto:support@truckpilot.ca">✉️ support@truckpilot.ca</a>
-        <a href="https://wa.me/14377005835">💬 WhatsApp</a>
-      </div>
+      <div class="foot-col"><h4>Product</h4><a href="#features">Features</a><a href="#how">How It Works</a><a href="#plans">Pricing</a><a href="about.html">About Us</a><a href="https://app.truckpilot.ca">Open App</a></div>
+      <div class="foot-col"><h4>Legal</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a><a href="privacy.html">Cookie Policy</a></div>
+      <div class="foot-col"><h4>Contact</h4><a href="tel:4377005835">📞 437-700-5835</a><a href="mailto:support@truckpilot.ca">✉️ support@truckpilot.ca</a><a href="https://wa.me/14377005835">💬 WhatsApp</a></div>
     </div>
-    <div class="footer-bottom">
+    <div class="foot-bot">
       <p>© 2026 TruckPilot · Alberta, Canada · All rights reserved</p>
-      <div class="footer-contact">
-        <a href="mailto:support@truckpilot.ca">support@truckpilot.ca</a>
-        <a href="tel:4377005835">437-700-5835</a>
-      </div>
+      <div style="display:flex;gap:16px"><a href="mailto:support@truckpilot.ca" style="font-size:12px;color:rgba(255,255,255,0.3);text-decoration:none">support@truckpilot.ca</a><a href="tel:4377005835" style="font-size:12px;color:rgba(255,255,255,0.3);text-decoration:none">437-700-5835</a></div>
     </div>
   </div>
 </footer>
 
+<!-- WHATSAPP -->
+<a href="https://wa.me/14377005835" target="_blank" class="wa">
+  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
 <script>
-function handleApply(e) {
+// Slideshow
+var sLabels=['Owner Dashboard','AI Load Scanner','Payroll','Tax Report','Driver Management'];
+var sCur=0;
+var slides=document.querySelectorAll('.pslide');
+var dots=document.querySelectorAll('.pdot');
+function goS(n){
+  slides[sCur].classList.remove('active');
+  dots[sCur].classList.remove('on');
+  sCur=n;
+  slides[sCur].classList.add('active');
+  dots[sCur].classList.add('on');
+  document.getElementById('plab').textContent=sLabels[sCur];
+}
+setInterval(function(){goS((sCur+1)%slides.length);},3000);
+
+// Smart redirect for returning users
+(function(){try{var s=localStorage.getItem('tp-session-v1');if(s)window.location.replace('https://app.truckpilot.ca');}catch(e){}})();
+
+// Contact form
+function handleContact(e){
   e.preventDefault();
-  const email = document.getElementById('apply-email').value;
-  window.location.href = 'https://app.truckpilot.ca?email=' + encodeURIComponent(email);
+  var btn=document.getElementById('csub');
+  btn.textContent='Sending...';btn.disabled=true;
+  fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:document.getElementById('cn').value,email:document.getElementById('ce').value,subject:document.getElementById('cs').value,message:document.getElementById('cm').value})})
+  .then(function(){document.getElementById('csuc').style.display='block';btn.style.display='none';})
+  .catch(function(){window.location.href='mailto:support@truckpilot.ca';});
 }
 </script>
-
 </body>
 </html>
