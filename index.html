@@ -24,6 +24,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:999;background:rgba(26,39,68,0.9
 .nav-links a:hover{color:#fff}
 .ncta{background:#FFD700;color:#1a2744;font-weight:800;font-size:14px;padding:10px 22px;border-radius:50px;text-decoration:none}
 .hmb{display:none;background:none;border:none;color:#fff;font-size:22px;cursor:pointer}
+/* MOBILE DROPDOWN */
+.mob-menu{position:fixed;top:64px;left:0;right:0;z-index:998;background:rgba(26,39,68,0.99);border-bottom:1px solid rgba(255,255,255,0.1);flex-direction:column;padding:12px 0;display:none}
+.mob-menu.open{display:flex!important;flex-direction:column!important}
+.mob-menu a{color:rgba(255,255,255,0.8);font-size:16px;font-weight:600;text-decoration:none;padding:14px 24px;border-bottom:1px solid rgba(255,255,255,0.06)}
+.mob-menu a:last-child{border-bottom:none}
+.mob-menu a:hover{color:#fff;background:rgba(255,255,255,0.05)}
+.mob-menu .mob-cta{background:#FFD700;color:#1a2744;font-weight:800;margin:12px 20px;border-radius:50px;text-align:center;border-bottom:none!important}
 /* HERO */
 .hero{background:linear-gradient(160deg,#0d1a35 0%,#1a2744 45%,#243B6E 100%);min-height:100vh;display:flex;align-items:center;padding:100px 40px 60px;position:relative}
 .hero-inner{max-width:1200px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
@@ -172,7 +179,7 @@ footer{background:#0a1020;padding:48px 40px 28px}
 #phone-show{animation:float 4s ease-in-out infinite}
 /* RESPONSIVE */
 @media(max-width:900px){
-  nav{padding:0 20px}.nav-links{display:none}.hmb{display:block}
+  nav{padding:0 20px}.nav-links{display:none!important}.hmb{display:block!important}
   .hero{padding:90px 20px 50px}.hero-inner{grid-template-columns:1fr;text-align:center}
   .hero h1{font-size:48px}.hero-btns{justify-content:center}.trust{justify-content:center}
   #phone-show{display:none}
@@ -199,8 +206,17 @@ footer{background:#0a1020;padding:48px 40px 28px}
     <a href="#contact">Contact</a>
     <a href="get-started.html" class="ncta">Get Started →</a>
   </div>
-  <button class="hmb" onclick="document.querySelector('.nav-links').style.display=document.querySelector('.nav-links').style.display==='flex'?'none':'flex'">☰</button>
+  <button class="hmb" onclick="toggleMenu()" id="hmb-btn">☰</button>
 </nav>
+
+<!-- MOBILE DROPDOWN -->
+<div class="mob-menu" id="mob-menu">
+  <a href="#features" onclick="closeMenu()">Features</a>
+  <a href="#how" onclick="closeMenu()">How It Works</a>
+  <a href="#plans" onclick="closeMenu()">Pricing</a>
+  <a href="#contact" onclick="closeMenu()">Contact</a>
+  <a href="get-started.html" class="mob-cta">Get Started →</a>
+</div>
 
 <!-- HERO -->
 <section class="hero">
@@ -732,11 +748,11 @@ footer{background:#0a1020;padding:48px 40px 28px}
       </div>
       <div class="foot-col"><h4>Product</h4><a href="#features">Features</a><a href="#how">How It Works</a><a href="#plans">Pricing</a><a href="about.html">About Us</a><a href="https://app.truckpilot.ca">Open App</a></div>
       <div class="foot-col"><h4>Legal</h4><a href="privacy.html">Privacy Policy</a><a href="terms.html">Terms of Service</a><a href="privacy.html">Cookie Policy</a></div>
-      <div class="foot-col"><h4>Contact</h4><a href="tel:4377005835">📞 437-700-5835</a><a href="mailto:support@truckpilot.ca">✉️ support@truckpilot.ca</a><a href="https://wa.me/14377005835">💬 WhatsApp</a></div>
+      <div class="foot-col"><h4>Contact</h4><a href="tel:4377005835">📞 437-700-5835</a><a href="/cdn-cgi/l/email-protection#0a797f7a7a65787e4a7e787f69617a6366657e24696b">✉️ <span class="__cf_email__" data-cfemail="ff8c8a8f8f908d8bbf8b8d8a9c948f9693908bd19c9e">[email&#160;protected]</span></a><a href="https://wa.me/14377005835">💬 WhatsApp</a></div>
     </div>
     <div class="foot-bot">
       <p>© 2026 TruckPilot · Alberta, Canada · All rights reserved</p>
-      <div style="display:flex;gap:16px"><a href="mailto:support@truckpilot.ca" style="font-size:12px;color:rgba(255,255,255,0.3);text-decoration:none">support@truckpilot.ca</a><a href="tel:4377005835" style="font-size:12px;color:rgba(255,255,255,0.3);text-decoration:none">437-700-5835</a></div>
+      <div style="display:flex;gap:16px"><a href="/cdn-cgi/l/email-protection#196a6c6969766b6d596d6b6c7a72697075766d377a78" style="font-size:12px;color:rgba(255,255,255,0.3);text-decoration:none"><span class="__cf_email__" data-cfemail="40333530302f323400343235232b30292c2f346e2321">[email&#160;protected]</span></a><a href="tel:4377005835" style="font-size:12px;color:rgba(255,255,255,0.3);text-decoration:none">437-700-5835</a></div>
     </div>
   </div>
 </footer>
@@ -746,7 +762,27 @@ footer{background:#0a1020;padding:48px 40px 28px}
   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
 </a>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// Mobile menu
+function toggleMenu(){
+  var menu=document.getElementById('mob-menu');
+  var btn=document.getElementById('hmb-btn');
+  menu.classList.toggle('open');
+  btn.textContent=menu.classList.contains('open')?'✕':'☰';
+}
+function closeMenu(){
+  document.getElementById('mob-menu').classList.remove('open');
+  document.getElementById('hmb-btn').textContent='☰';
+}
+// Close menu when clicking outside
+document.addEventListener('click',function(e){
+  var menu=document.getElementById('mob-menu');
+  var btn=document.getElementById('hmb-btn');
+  if(menu.classList.contains('open')&&!menu.contains(e.target)&&e.target!==btn){
+    closeMenu();
+  }
+});
+
 // Slideshow
 var sLabels=['Owner Dashboard','AI Load Scanner','Payroll','Tax Report','Driver Management'];
 var sCur=0;
@@ -769,10 +805,4 @@ function handleContact(e){
   e.preventDefault();
   var btn=document.getElementById('csub');
   btn.textContent='Sending...';btn.disabled=true;
-  fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:document.getElementById('cn').value,email:document.getElementById('ce').value,subject:document.getElementById('cs').value,message:document.getElementById('cm').value})})
-  .then(function(){document.getElementById('csuc').style.display='block';btn.style.display='none';})
-  .catch(function(){window.location.href='mailto:support@truckpilot.ca';});
-}
-</script>
-</body>
-</html>
+  fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stri
