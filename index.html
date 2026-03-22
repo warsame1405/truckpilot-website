@@ -23,7 +23,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:999;background:rgba(26,39,68,0.9
 .nav-links a{color:rgba(255,255,255,0.7);font-size:14px;font-weight:600;text-decoration:none}
 .nav-links a:hover{color:#fff}
 .ncta{background:#FFD700;color:#1a2744;font-weight:800;font-size:14px;padding:10px 22px;border-radius:50px;text-decoration:none}
-.hmb{display:none;background:none;border:none;color:#fff;font-size:22px;cursor:pointer}
+.hmb{display:block;background:none;border:none;color:#fff;font-size:22px;cursor:pointer}
 /* MOBILE DROPDOWN */
 .mob-menu{position:fixed;top:64px;left:0;right:0;z-index:998;background:rgba(26,39,68,0.99);border-bottom:1px solid rgba(255,255,255,0.1);flex-direction:column;padding:12px 0;display:none}
 .mob-menu.open{display:flex!important;flex-direction:column!important}
@@ -179,7 +179,7 @@ footer{background:#0a1020;padding:48px 40px 28px}
 #phone-show{animation:float 4s ease-in-out infinite}
 /* RESPONSIVE */
 @media(max-width:900px){
-  nav{padding:0 20px}.nav-links{display:none!important}.hmb{display:block!important}
+  nav{padding:0 20px}.nav-links{display:none!important;visibility:hidden}.hmb{display:block!important}
   .hero{padding:90px 20px 50px}.hero-inner{grid-template-columns:1fr;text-align:center}
   .hero h1{font-size:48px}.hero-btns{justify-content:center}.trust{justify-content:center}
   #phone-show{display:none}
